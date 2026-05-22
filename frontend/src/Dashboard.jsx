@@ -14,8 +14,7 @@ import SemesterSettingsCard from "./components/SemesterSettingsCard.jsx";
 // const API_BASE = "http://localhost:8000/api";
 
 // Tunnel
-// const API_BASE = "http://127.0.0.1:8000/backend/api";
-const API_BASE = "https://yummy-rooms-run.loca.lt/backend/api";
+const API_BASE = "https://127.0.0.1:8000/backend/api";
 
 function Dashboard({ user, logout }) {
   const [currentView, setCurrentView] = useState("papers");

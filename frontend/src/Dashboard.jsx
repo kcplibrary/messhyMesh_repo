@@ -150,47 +150,55 @@ function Dashboard({ user, logout }) {
   //   return matchesSearch && matchesSector;
   // });
 
-const fetchFiles = useCallback(async () => {
-  try {
-    // 🌟 Hardcode the URL directly into the string so the phone can never lose it!
-    const res = await axios.get("https://customer-yahoo-outing.ngrok-free.dev/backend/api/get_files.php?ngrok-skip-browser-warning=true");
-    if (Array.isArray(res.data)) setFiles(res.data);
-  } catch (err) {
-    console.error(err);
-  }
-}, []); // Clear out dependencies since the URL is a hard string now
-
-const fetchUsers = useCallback(async () => {
-  try {
-    const res = await axios.get("https://customer-yahoo-outing.ngrok-free.dev/backend/api/get_users.php?ngrok-skip-browser-warning=true");
-    if (Array.isArray(res.data)) setUsersList(res.data);
-  } catch (err) {
-    console.error(err);
-  }
-}, []);
-
-const fetchCommunities = useCallback(async () => {
-  try {
-    const res = await axios.get("https://customer-yahoo-outing.ngrok-free.dev/backend/api/get_communities.php?ngrok-skip-browser-warning=true");
-    if (Array.isArray(res.data)) setCommunities(res.data);
-  } catch (err) {
-    console.error(err);
-  }
-}, []);
-
-const fetchStats = useCallback(async () => {
-  try {
-    const res = await axios.get("https://customer-yahoo-outing.ngrok-free.dev/backend/api/get_stats.php?ngrok-skip-browser-warning=true");
-    if (res.data && res.data.status === "success") {
-      setStats(res.data.stats);
-      if (res.data.stats.semesterLabel) setSemLabel(res.data.stats.semesterLabel);
-      if (res.data.stats.semesterStart) setSemStart(res.data.stats.semesterStart);
-      if (res.data.stats.semesterEnd) setSemEnd(res.data.stats.semesterEnd);
+  const fetchFiles = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/get_files.php`);
+      if (Array.isArray(res.data)) setFiles(res.data);
+    } catch (err) {
+      console.error(err);
+      setStatusMsg("File sync failed.");
     }
-  } catch (err) {
-    console.error("Stats Fetch Error:", err);
-  }
-}, []);
+  }, []);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/get_users.php`);
+      if (Array.isArray(res.data)) setUsersList(res.data);
+    } catch (err) {
+      console.error(err);
+      setStatusMsg("User sync failed.");
+    }
+  }, []);
+
+  const fetchCommunities = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/get_communities.php`);
+      if (Array.isArray(res.data)) setCommunities(res.data);
+    } catch (err) {
+      console.error("Community Fetch Error:", err);
+      setStatusMsg("Failed to sync sectors.");
+    }
+  }, []);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/get_stats.php`);
+      if (res.data.status === "success") {
+        setStats(res.data.stats); // This updates the state
+
+        // Auto-seed text inputs with the active values from database
+        if (res.data.stats.semesterLabel) {
+          setSemLabel(res.data.stats.semesterLabel);
+        }
+        // If your stats backend endpoint maps values for active dates:
+        if (res.data.stats.semesterStart)
+          setSemStart(res.data.stats.semesterStart);
+        if (res.data.stats.semesterEnd) setSemEnd(res.data.stats.semesterEnd);
+      }
+    } catch (err) {
+      console.error("Stats Fetch Error:", err);
+    }
+  }, []);
 
   useEffect(() => {
     fetchFiles();

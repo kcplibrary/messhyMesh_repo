@@ -170,15 +170,35 @@ function Dashboard({ user, logout }) {
     }
   }, []);
 
+  // const fetchCommunities = useCallback(async () => {
+  //   try {
+  //     const res = await axios.get(`${API_BASE}/get_communities.php`);
+  //     if (Array.isArray(res.data)) setCommunities(res.data);
+  //   } catch (err) {
+  //     console.error("Community Fetch Error:", err);
+  //     setStatusMsg("Failed to sync sectors.");
+  //   }
+  // }, []);
+
+  // fetchCommunities tunnel
   const fetchCommunities = useCallback(async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/get_communities.php`);
-      if (Array.isArray(res.data)) setCommunities(res.data);
-    } catch (err) {
-      console.error("Community Fetch Error:", err);
-      setStatusMsg("Failed to sync sectors.");
+  try {
+    const res = await axios.get(`${API_BASE}/get_communities.php`);
+    
+    // Check if the response data is an array directly
+    if (Array.isArray(res.data)) {
+      setCommunities(res.data); // Directly load the array into state
+    } else if (res.data && res.data.status === "success") {
+      // Fallback in case your schema structure changes later
+      setCommunities(res.data.communities || res.data.sectors);
+    } else {
+      console.warn("Unexpected communities payload structure:", res.data);
     }
-  }, []);
+  } catch (err) {
+    console.error("Community Fetch Error:", err);
+    alert("Failed to sync sectors.");
+  }
+}, [API_BASE]);
 
   const fetchStats = useCallback(async () => {
     try {

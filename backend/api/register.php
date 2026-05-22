@@ -3,7 +3,6 @@ ob_start();
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-// 🌟 CRITICAL: 'ngrok-skip-browser-warning' must be explicitly allowed here!
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Origin, Accept, X-Auth-Token");
 header("Content-Type: application/json; charset=UTF-8");
 

@@ -152,37 +152,45 @@ function Dashboard({ user, logout }) {
 
   const fetchFiles = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_files.php`);
+      const res = await axios.get(`${API_BASE}/get_files.php`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      });
       if (Array.isArray(res.data)) setFiles(res.data);
     } catch (err) {
       console.error(err);
       setStatusMsg("File sync failed.");
     }
-  }, []);
+  }, [API_BASE]);
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_users.php`);
+      const res = await axios.get(`${API_BASE}/get_users.php`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      });
       if (Array.isArray(res.data)) setUsersList(res.data);
     } catch (err) {
       console.error(err);
       setStatusMsg("User sync failed.");
     }
-  }, []);
+  }, [API_BASE]);
 
   const fetchCommunities = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_communities.php`);
+      const res = await axios.get(`${API_BASE}/get_communities.php`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      });
       if (Array.isArray(res.data)) setCommunities(res.data);
     } catch (err) {
       console.error("Community Fetch Error:", err);
       setStatusMsg("Failed to sync sectors.");
     }
-  }, []);
+  }, [API_BASE]);
 
   const fetchStats = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_stats.php`);
+      const res = await axios.get(`${API_BASE}/get_stats.php`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      });
       if (res.data.status === "success") {
         setStats(res.data.stats); // This updates the state
 
@@ -198,7 +206,7 @@ function Dashboard({ user, logout }) {
     } catch (err) {
       console.error("Stats Fetch Error:", err);
     }
-  }, []);
+  }, [API_BASE]);
 
   useEffect(() => {
     fetchFiles();

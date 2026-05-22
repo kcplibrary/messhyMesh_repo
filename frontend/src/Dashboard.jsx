@@ -152,9 +152,7 @@ function Dashboard({ user, logout }) {
 
   const fetchFiles = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_files.php`, {
-        headers: { 'ngrok-skip-browser-warning': 'true' }
-      });
+      const res = await axios.get(`${API_BASE}/get_files.php`);
       if (Array.isArray(res.data)) setFiles(res.data);
     } catch (err) {
       console.error(err);
@@ -164,9 +162,7 @@ function Dashboard({ user, logout }) {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_users.php`, {
-        headers: { 'ngrok-skip-browser-warning': 'true' }
-      });
+      const res = await axios.get(`${API_BASE}/get_users.php`);
       if (Array.isArray(res.data)) setUsersList(res.data);
     } catch (err) {
       console.error(err);
@@ -176,9 +172,7 @@ function Dashboard({ user, logout }) {
 
   const fetchCommunities = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_communities.php`, {
-        headers: { 'ngrok-skip-browser-warning': 'true' }
-      });
+      const res = await axios.get(`${API_BASE}/get_communities.php`);
       if (Array.isArray(res.data)) setCommunities(res.data);
     } catch (err) {
       console.error("Community Fetch Error:", err);
@@ -188,9 +182,7 @@ function Dashboard({ user, logout }) {
 
   const fetchStats = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_stats.php`, {
-        headers: { 'ngrok-skip-browser-warning': 'true' }
-      });
+      const res = await axios.get(`${API_BASE}/get_stats.php`);
       if (res.data.status === "success") {
         setStats(res.data.stats); // This updates the state
 

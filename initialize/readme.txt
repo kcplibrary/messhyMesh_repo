@@ -375,5 +375,5 @@ Temporary token:
 
 
 git add .
-git commit -m "Fix View file asset links to use dynamic tunnel root directory"
+git commit -m "Fix backend routing paths from phpmyadmin to messymesh folder root"
 git push origin main

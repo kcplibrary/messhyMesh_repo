@@ -182,7 +182,8 @@ function Dashboard({ user, logout }) {
 
   const fetchStats = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_stats.php`);
+      // const res = await axios.get(`${API_BASE}/get_stats.php`);
+      const res = await axios.get(`${API_BASE}/get_stats.php?ngrok-skip-browser-warning=true&_=${new Date().getTime()}`);
       if (res.data.status === "success") {
         setStats(res.data.stats); // This updates the state
 

@@ -1,9 +1,4 @@
 <?php
-// header("Access-Control-Allow-Origin: *");
-// header("Content-Type: application/json");
-
-// tunnel
-// Clear any accidental whitespaces or notices from breaking headers
 ob_start();
 
 header("Access-Control-Allow-Origin: *");
@@ -15,6 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
+
+// header("Access-Control-Allow-Origin: *");
+// header("Content-Type: application/json");
+
 
 require_once __DIR__ . '/../config/db_connect.php';
 

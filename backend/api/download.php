@@ -1,8 +1,4 @@
 <?php
-// header("Access-Control-Allow-Origin: *");
-
-// tunnel
-// Clear any accidental whitespaces or notices from breaking headers
 ob_start();
 
 header("Access-Control-Allow-Origin: *");
@@ -14,6 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
+
+// header("Access-Control-Allow-Origin: *");
 
 $file = $_GET['file'] ?? '';
 // Path goes up one level to find the 'uploads' folder

@@ -1,5 +1,4 @@
 <?php
-// Clear any accidental whitespace or prior output buffers
 ob_start();
 
 header("Access-Control-Allow-Origin: *");

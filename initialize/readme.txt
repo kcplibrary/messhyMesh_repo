@@ -373,3 +373,7 @@ The script automates the "Ground Zero" setup for **Project messyMesh**:
 	
 Temporary token: 
 
+
+git add .
+git commit -m "Fix View file asset links to use dynamic tunnel root directory"
+git push origin main

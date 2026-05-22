@@ -160,7 +160,7 @@ function Dashboard({ user, logout }) {
       console.error(err);
       setStatusMsg("File sync failed.");
     }
-  }, [API_BASE]);
+  }, []);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -172,7 +172,7 @@ function Dashboard({ user, logout }) {
       console.error(err);
       setStatusMsg("User sync failed.");
     }
-  }, [API_BASE]);
+  }, []);
 
   const fetchCommunities = useCallback(async () => {
     try {
@@ -184,7 +184,7 @@ function Dashboard({ user, logout }) {
       console.error("Community Fetch Error:", err);
       setStatusMsg("Failed to sync sectors.");
     }
-  }, [API_BASE]);
+  }, []);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -206,7 +206,7 @@ function Dashboard({ user, logout }) {
     } catch (err) {
       console.error("Stats Fetch Error:", err);
     }
-  }, [API_BASE]);
+  }, []);
 
   useEffect(() => {
     fetchFiles();

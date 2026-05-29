@@ -11,10 +11,7 @@ import { generateAPA7 } from "./components/utils/citationHelper.js";
 import HeaderNav from "./components/HeaderNav.jsx";
 import SemesterSettingsCard from "./components/SemesterSettingsCard.jsx";
 
-// const API_BASE = "http://localhost:8000/api";
-
-// Tunnel
-const API_BASE = "http://127.0.0.1:8000/backend/api";
+const API_BASE = "http://localhost:8000/api";
 
 function Dashboard({ user, logout }) {
   const [currentView, setCurrentView] = useState("papers");
@@ -267,17 +264,10 @@ function Dashboard({ user, logout }) {
 
   const handleRename = async (id) => {
     try {
-      // const response = await axios.post(
-      //   "http://localhost:8000/api/update_community.php",
-      //   { id: id, name: editName },
-      // );
-
-      // tunnel
-      const response = await axios.post(`${API_BASE}/update_community.php`, {
-        id: id,
-        name: editName,
-      });
-
+      const response = await axios.post(
+        "http://localhost:8000/api/update_community.php",
+        { id: id, name: editName },
+      );
       if (response.data.status === "success") {
         setCommunities(
           communities.map((c) => (c.id === id ? { ...c, name: editName } : c)),
@@ -296,14 +286,10 @@ function Dashboard({ user, logout }) {
     )
       return;
     try {
-      // const response = await axios.post(
-      //   "http://localhost:8000/api/delete_community.php",
-      //   { id },
-      // );
-
-      // tunnel
-      const response = await axios.post(`${API_BASE}/delete_community.php`, { id });
-
+      const response = await axios.post(
+        "http://localhost:8000/api/delete_community.php",
+        { id },
+      );
       if (response.data.status === "success")
         setCommunities(communities.filter((c) => c.id !== id));
       else alert(response.data.message);
@@ -415,10 +401,7 @@ function Dashboard({ user, logout }) {
       setStatusMsg("Preparing download...");
 
       // Fixed the syntax error (removed leading backslash and trailing backtick)
-      // const fileUrl = `http://localhost:8000/api/download.php?file=${filename}`;
-
-      // tunnel
-      const fileUrl = `${API_BASE}/download.php?file=${filename}`;
+      const fileUrl = `http://localhost:8000/api/download.php?file=${filename}`;
 
       // Create a temporary link element
       const link = document.createElement("a");
@@ -877,10 +860,7 @@ function Dashboard({ user, logout }) {
                   </div>
                   <div className="flex items-center gap-2">
                     <a
-                      // href={`http://localhost:8000/uploads/${file.filename}`}
-
-                      // tunnel
-                      href={`${API_BASE.replace('/api', '')}/uploads/${file.filename}`}
+                      href={`http://localhost:8000/uploads/${file.filename}`}
                       target="_blank"
                       rel="noreferrer"
                       className="px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[10px] font-black uppercase transition-all"

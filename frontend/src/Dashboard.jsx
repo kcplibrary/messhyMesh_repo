@@ -150,34 +150,15 @@ function Dashboard({ user, logout }) {
   //   return matchesSearch && matchesSector;
   // });
 
-  // const fetchFiles = useCallback(async () => {
-  //   try {
-  //     const res = await axios.get(`${API_BASE}/get_files.php`);
-  //     if (Array.isArray(res.data)) setFiles(res.data);
-  //   } catch (err) {
-  //     console.error(err);
-  //     setStatusMsg("File sync failed.");
-  //   }
-  // }, []);
-
-  // tunnel
   const fetchFiles = useCallback(async () => {
-  try {
-    const res = await axios.get(`${API_BASE}/get_files.php`, {
-      headers: {
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "69420"
-      }
-    });
-
-    if (Array.isArray(res.data)) {
-      setFiles(res.data);
+    try {
+      const res = await axios.get(`${API_BASE}/get_files.php`);
+      if (Array.isArray(res.data)) setFiles(res.data);
+    } catch (err) {
+      console.error(err);
+      setStatusMsg("File sync failed.");
     }
-  } catch (err) {
-    console.error(err);
-    setStatusMsg("File sync failed.");
-  }
-}, []);
+  }, []);
 
   const fetchUsers = useCallback(async () => {
     try {

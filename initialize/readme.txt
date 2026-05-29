@@ -361,8 +361,18 @@ The script automates the "Ground Zero" setup for **Project messyMesh**:
 	    Additional info: where the database lives on the computer server
 	    admin:///var/lib/mysql/messymesh_db
 	    
-	    How to check:
-	    sudo ls -la /var/lib/mysql/messymesh_db
+		    How to check:
+		    sudo ls -la /var/lib/mysql/messymesh_db
+	    
+	    Ngrok Setup for messyMesh
+		customer-yahoo-outing.ngrok-free.dev
+		rd_3E1YsA6HMMk41lr1PBivsMdvXHR
+		ngrok http 8000
+		
+		Github token:
+		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
+
+
 	    
 	    
 ## Admin Dashboard and Admin access
@@ -372,12 +382,8 @@ The script automates the "Ground Zero" setup for **Project messyMesh**:
 	
 2. **Create the Dashboard Component**
 	```Create a new file in frontend/src/Dashboard.jsx.
-
-	
-	
-Temporary token: 
-
-
+_____________________________________________________________________________________________
+Temporary token:
 git add .
 git commit -m "ayappooooo unayennn"
 git push origin main

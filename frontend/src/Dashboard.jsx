@@ -895,14 +895,18 @@ function Dashboard({ user, logout }) {
                       View
                     </a> */}
 
-                    <span className="text-xs text-slate-400 block mb-1">
-                      DB Value: "{file.file_name || file.filename || file.name}"
-                    </span>
                     <button
-                      onClick={() => handleViewFile(file.file_name)}
-                      className="px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[10px] font-black uppercase transition-all"
+                      onClick={() =>
+                        handleViewFile(
+                          file.file_name ||
+                            file.filename ||
+                            file.name ||
+                            file.path,
+                        )
+                      }
+                      className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl font-bold transition-all text-white"
                     >
-                      View
+                      VIEW
                     </button>
 
                     <button

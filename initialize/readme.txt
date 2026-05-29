@@ -380,8 +380,7 @@ The script automates the "Ground Zero" setup for **Project messyMesh**:
 2. **Create the Dashboard Component**
 	```Create a new file in frontend/src/Dashboard.jsx.
 _____________________________________________________________________________________________
+Temporary token:
 git add .
 git commit -m "ayappooooo unayennn"
 git push origin main
-
-

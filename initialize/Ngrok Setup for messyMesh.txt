@@ -1,9 +1,0 @@
-Ngrok Setup for messyMesh
-
-customer-yahoo-outing.ngrok-free.dev
-
-rd_3E1YsA6HMMk41lr1PBivsMdvXHR
-
-ngrok http 8000
-
-

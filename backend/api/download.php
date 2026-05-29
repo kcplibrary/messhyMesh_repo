@@ -1,17 +1,22 @@
 <?php
-ob_start();
-
+// 1. Grant global access permission to Cloudflare's incoming frontend requests
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Origin, Accept, X-Auth-Token");
-header("Content-Type: application/json; charset=utf-8");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning");
+header("Content-Type: application/json");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+// 2. Intercept and wave through browser safety pre-flight checks instantly
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
-    exit;
+    exit();
 }
 
-// header("Access-Control-Allow-Origin: *");
+// 3. Establish your standard connection to your local mysql folder
+$conn = new mysqli("127.0.0.1", "root", "YOUR_LOCAL_PASSWORD", "messymesh_db");
+if ($conn->connect_error) {
+    die(json_encode(["error" => "Database connection offline"]));
+}
+
 
 $file = $_GET['file'] ?? '';
 // Path goes up one level to find the 'uploads' folder

@@ -3,11 +3,13 @@ import axios from "axios";
 import "./index.css";
 import Dashboard from "./Dashboard";
 
-const InactivityHandler = ({ timeoutInSeconds, onLogout }) => {
+// const InactivityHandler = ({ timeoutInMinutes, onLogout }) => {
+  const InactivityHandler = ({ timeoutInSeconds, onLogout }) => {
   useEffect(() => {
     let timer;
     const resetTimer = () => {
       if (timer) clearTimeout(timer);
+      // timer = setTimeout(onLogout, timeoutInMinutes * 60 * 1000);
       timer = setTimeout(onLogout, timeoutInSeconds * 1000);
     };
     const events = ["mousemove", "mousedown", "keypress", "scroll"];
@@ -17,6 +19,7 @@ const InactivityHandler = ({ timeoutInSeconds, onLogout }) => {
       if (timer) clearTimeout(timer);
       events.forEach((e) => window.removeEventListener(e, resetTimer));
     };
+  // }, [onLogout, timeoutInMinutes]);
   }, [onLogout, timeoutInSeconds]);
   return null;
 };
@@ -25,7 +28,9 @@ function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  // const [user, setUser] = useState(null);
 
+  // 1. AUTO-LOAD: Check if someone is already logged in when the page opens
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("mesh_session");
     return savedUser ? JSON.parse(savedUser) : null;
@@ -38,18 +43,15 @@ function App() {
     formData.append("password", password);
 
     try {
-      // const response = await axios.post(
-      //   "http://localhost:8000/api/login.php",
-      //   formData,
-
-      // tunnel
-        const response = await axios.post(
-        "http://127.0.0.1:8000/backend/api/login.php",
-        formData
+      const response = await axios.post(
+        "http://localhost:8000/api/login.php",
+        formData,
       );
 
       if (response.data.status === "connection success") {
         const userData = { username: username, role: response.data.role };
+
+        // 2. THE SAVE: Write to the browser's notebook
         localStorage.setItem("mesh_session", JSON.stringify(userData));
         setUser(userData);
       } else {
@@ -61,12 +63,13 @@ function App() {
     }
   };
 
+  // 3. THE CLEAN LOGOUT: Wipes everything
   const handleLogout = () => {
-    localStorage.removeItem("mesh_session");
-    setUser(null);
-    setUsername("");
-    setPassword("");
-    setMessage("You have been logged out.");
+    localStorage.removeItem("mesh_session"); // Rip out the notebook page
+    setUser(null); // Switch screen to Login
+    setUsername(""); // Clear the text box
+    setPassword(""); // Clear the text box
+    setMessage("You have been logged out."); // Reset message
   };
 
   if (user) {
@@ -79,40 +82,38 @@ function App() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-slate-900 flex items-center justify-center p-4 sm:p-6 md:p-8 text-slate-100 selection:bg-blue-500/30">
-      <div className="w-full max-w-sm sm:max-w-md bg-slate-800 border border-slate-700 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 transition-all duration-300">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-center mb-1 sm:mb-2 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent tracking-tight">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 text-slate-100">
+      <div className="w-full max-w-md bg-slate-800 border border-slate-700 rounded-3xl shadow-2xl p-10">
+        <h1 className="text-5xl font-black text-center mb-2 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
           KCPLIBRARY
         </h1>
-        <p className="text-center text-slate-400 mb-6 sm:mb-8 md:mb-10 uppercase tracking-[0.15em] text-[10px] sm:text-xs font-bold">
-          School Repository
+        <p className="text-center text-slate-400 mb-10 uppercase tracking-widest text-xs font-bold">
+          Secure Archive Access
         </p>
 
-        <form onSubmit={handleLogin} className="space-y-4 sm:space-y-5 md:space-y-6">
-          <div className="space-y-3 sm:space-y-4">
-            <input
-              type="text"
-              placeholder="Username"
-              className="w-full px-4 py-3 sm:py-4 bg-slate-900 border border-slate-700 rounded-xl outline-none text-white text-sm sm:text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoComplete="off"
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full px-4 py-3 sm:py-4 bg-slate-900 border border-slate-700 rounded-xl outline-none text-white text-sm sm:text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <button className="w-full py-3 sm:py-4 bg-blue-600 hover:bg-blue-500 active:scale-[0.98] font-black rounded-xl shadow-lg transition-all text-white text-sm sm:text-base tracking-wide">
+        <form onSubmit={handleLogin} className="space-y-6">
+          <input
+            type="text"
+            placeholder="Username"
+            className="w-full px-4 py-4 bg-slate-900 border border-slate-700 rounded-xl outline-none text-white"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="off" // Tells browser NOT to suggest old names
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-4 bg-slate-900 border border-slate-700 rounded-xl outline-none text-white"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button className="w-full py-4 bg-blue-600 hover:bg-blue-500 font-black rounded-xl shadow-lg transition-all text-white">
             LOGIN
           </button>
         </form>
 
         {message && (
-          <div className="mt-6 sm:mt-8 p-3 sm:p-4 rounded-xl text-center font-bold text-xs sm:text-sm border border-slate-600 bg-slate-900/40 text-slate-300">
+          <div className="mt-8 p-4 rounded-xl text-center font-bold border-2 border-slate-600">
             {message}
           </div>
         )}

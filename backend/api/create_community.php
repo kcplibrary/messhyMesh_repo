@@ -1,25 +1,25 @@
 <?php
-ob_start();
-
+// 1. Grant global access permission to Cloudflare's incoming frontend requests
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-// 🌟 CRITICAL: 'ngrok-skip-browser-warning' must be explicitly allowed here!s
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Origin, Accept, X-Auth-Token");
-header("Content-Type: application/json; charset=utf-8");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning");
+header("Content-Type: application/json");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+// 2. Intercept and wave through browser safety pre-flight checks instantly
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
-    exit;
+    exit();
 }
 
-// header("Access-Control-Allow-Origin: *");
-// header("Access-Control-Allow-Methods: POST, OPTIONS");
-// header("Access-Control-Allow-Headers: Content-Type");
-// header("Content-Type: application/json");
-
-// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
+// 3. Establish your standard connection to your local mysql folder
+$conn = new mysqli("127.0.0.1", "root", "YOUR_LOCAL_PASSWORD", "messymesh_db");
+if ($conn->connect_error) {
+    die(json_encode(["error" => "Database connection offline"]));
+}
 
 require_once __DIR__ . '/../config/db_connect.php';
+
+// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
 
 // 2. Read the data from React
 $data = json_decode(file_get_contents("php://input"), true);

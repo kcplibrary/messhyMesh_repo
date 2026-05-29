@@ -11,7 +11,8 @@ import { generateAPA7 } from "./components/utils/citationHelper.js";
 import HeaderNav from "./components/HeaderNav.jsx";
 import SemesterSettingsCard from "./components/SemesterSettingsCard.jsx";
 
-const API_BASE = "http://localhost:8000/api";
+// const API_BASE = "http://localhost:8000/api";
+const API_BASE = "https://customer-yahoo-outing.ngrok-free.dev/backend/api";
 
 function Dashboard({ user, logout }) {
   const [currentView, setCurrentView] = useState("papers");
@@ -147,39 +148,50 @@ function Dashboard({ user, logout }) {
   //   return matchesSearch && matchesSector;
   // });
 
+  // tunnel
+  const ngrokConfig = {
+  headers: {
+    "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": "true"
+  }
+};
+
   const fetchFiles = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_files.php`);
+      const res = await axios.get(`${API_BASE}/get_files.php`, ngrokConfig);
       if (Array.isArray(res.data)) setFiles(res.data);
     } catch (err) {
       console.error(err);
       setStatusMsg("File sync failed.");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_users.php`);
+      const res = await axios.get(`${API_BASE}/get_users.php`, ngrokConfig);
       if (Array.isArray(res.data)) setUsersList(res.data);
     } catch (err) {
       console.error(err);
       setStatusMsg("User sync failed.");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCommunities = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_communities.php`);
+      const res = await axios.get(`${API_BASE}/get_communities.php`, ngrokConfig);
       if (Array.isArray(res.data)) setCommunities(res.data);
     } catch (err) {
       console.error("Community Fetch Error:", err);
       setStatusMsg("Failed to sync sectors.");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchStats = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_stats.php`);
+      const res = await axios.get(`${API_BASE}/get_stats.php`, ngrokConfig);
       if (res.data.status === "success") {
         setStats(res.data.stats); // This updates the state
 
@@ -195,6 +207,7 @@ function Dashboard({ user, logout }) {
     } catch (err) {
       console.error("Stats Fetch Error:", err);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

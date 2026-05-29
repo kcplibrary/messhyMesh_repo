@@ -355,10 +355,9 @@ function Dashboard({ user, logout }) {
   };
 
   const handleViewFile = (filename) => {
-    // 1. Map directly to your public dynamic ngrok tunnel path
-    const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/view_file.php?file=${encodeURIComponent(filename)}`;
+    // Added &ngrok-skip-browser-warning=true directly to the URL structure
+    const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/view_file.php?file=${encodeURIComponent(filename)}&ngrok-skip-browser-warning=true`;
 
-    // 2. Open it in a clean browser window/tab safely
     window.open(fileUrl, "_blank");
   };
 

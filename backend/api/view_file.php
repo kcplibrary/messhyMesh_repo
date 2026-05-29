@@ -4,7 +4,7 @@ require_once __DIR__ . '/../config/db_connect.php';
 
 // 2. Point to the folder on your Ubuntu computer where uploads are actually saved
 // Adjust this folder name path if your uploads folder is named differently
-$uploadDirectory = __DIR__ . '/../uploads/'; 
+$uploadDirectory = __DIR__ . '/../backend/uploads/'; 
 
 $filename = $_GET['file'] ?? '';
 

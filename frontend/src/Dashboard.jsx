@@ -150,11 +150,11 @@ function Dashboard({ user, logout }) {
 
   // tunnel
   const ngrokConfig = {
-  headers: {
-    "Content-Type": "application/json",
-    "ngrok-skip-browser-warning": "true"
-  }
-};
+    headers: {
+      "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "true",
+    },
+  };
 
   const fetchFiles = useCallback(async () => {
     try {
@@ -164,7 +164,7 @@ function Dashboard({ user, logout }) {
       console.error(err);
       setStatusMsg("File sync failed.");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUsers = useCallback(async () => {
@@ -175,18 +175,21 @@ function Dashboard({ user, logout }) {
       console.error(err);
       setStatusMsg("User sync failed.");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCommunities = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_communities.php`, ngrokConfig);
+      const res = await axios.get(
+        `${API_BASE}/get_communities.php`,
+        ngrokConfig,
+      );
       if (Array.isArray(res.data)) setCommunities(res.data);
     } catch (err) {
       console.error("Community Fetch Error:", err);
       setStatusMsg("Failed to sync sectors.");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchStats = useCallback(async () => {
@@ -207,7 +210,7 @@ function Dashboard({ user, logout }) {
     } catch (err) {
       console.error("Stats Fetch Error:", err);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -349,6 +352,14 @@ function Dashboard({ user, logout }) {
       console.error(err);
       setStatusMsg("Archive Failed: Network/Server Error");
     }
+  };
+
+  const handleViewFile = (filename) => {
+    // 1. Map directly to your public dynamic ngrok tunnel path
+    const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/view_file.php?file=${encodeURIComponent(filename)}`;
+
+    // 2. Open it in a clean browser window/tab safely
+    window.open(fileUrl, "_blank");
   };
 
   const handleCreateCommunity = async (e) => {
@@ -875,15 +886,21 @@ function Dashboard({ user, logout }) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <a
-                      // href={`http://localhost:8000/uploads/${file.filename}`}
+                    {/* <a
+                      href={`http://localhost:8000/uploads/${file.filename}`}
                       href={`https://customer-yahoo-outing.ngrok-free.dev/backend/uploads/${file.filename}`}
                       target="_blank"
                       rel="noreferrer"
                       className="px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[10px] font-black uppercase transition-all"
                     >
                       View
-                    </a>
+                    </a> */}
+                    <button
+                      onClick={() => handleViewFile(file.file_name)}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-bold transition-all"
+                    >
+                      VIEW FILE
+                    </button>
 
                     <button
                       onClick={() => handleDownload(file.filename)}

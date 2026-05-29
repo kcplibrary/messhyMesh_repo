@@ -904,7 +904,7 @@ function Dashboard({ user, logout }) {
                             file.path,
                         )
                       }
-                      className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl font-bold transition-all text-white"
+                      className="px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[10px] font-black uppercase transition-all"
                     >
                       VIEW
                     </button>

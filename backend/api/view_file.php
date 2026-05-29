@@ -1,47 +1,47 @@
 <?php
-// 1. Grant global access permission to Cloudflare's incoming frontend requests
+// 1. Force global CORS clearances so the browser doesn't trip out
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning");
-header("Content-Type: application/json");
+header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, ngrok-skip-browser-warning");
 
-// 2. Intercept and wave through browser safety pre-flight checks instantly
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// 1. Inherit CORS security handshakes and database context strings instantly
-require_once __DIR__ . '/../config/db_connect.php';
-
-// 2. Point to the folder on your Ubuntu computer where uploads are actually saved
-// Adjust this folder name path if your uploads folder is named differently
+// 2. Exact absolute path to your folder
 $uploadDirectory = '/home/kcplibrary/Documents/messyMesh/backend/uploads/';
 
+// 3. Get file parameter and explicitly DECODE it to handle long names with dashes/numbers
 $filename = $_GET['file'] ?? '';
-
-// Security Check: Block directory traversal hacks (like passing "../../etc/passwd")
+$filename = rawurldecode($filename); // Cleans up %20, dashes, and URL mutations
 $filename = basename($filename); 
+
 $filePath = $uploadDirectory . $filename;
 
+// 4. Enhanced Path Debugger: Let's find out EXACTLY what went wrong
 if (!$filename || !file_exists($filePath)) {
     header("HTTP/1.1 404 Not Found");
     header('Content-Type: application/json');
-    die(json_encode(["status" => "error", "message" => "Requested file does not exist on source disk."]));
+    
+    // Check if the directory itself is unreadable by the PHP server engine
+    $dirReadable = is_readable($uploadDirectory) ? "Yes" : "No";
+    
+    die(json_encode([
+        "status" => "error",
+        "message" => "Requested file does not exist on source disk.",
+        "debug_filename_parsed" => $filename,
+        "debug_absolute_path_checked" => $filePath,
+        "is_uploads_folder_readable_by_php" => $dirReadable
+    ]));
 }
 
-// 3. Detect the correct type of file automatically
+// 5. If it gets past the check, stream it!
 $fileMimeType = mime_content_type($filePath);
-
-// 4. Force browser streaming rules
-header("Access-Control-Allow-Origin: *");
 header("Content-Type: " . $fileMimeType);
 header("Content-Length: " . filesize($filePath));
-
-// Optional: Change "inline" to "attachment" if you want to FORCE download instead of previewing
 header("Content-Disposition: inline; filename=\"" . $filename . "\"");
 
-// 5. Read the file from the hard drive and stream it across the ngrok tunnel
 readfile($filePath);
 exit;
 ?>

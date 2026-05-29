@@ -278,7 +278,8 @@ function Dashboard({ user, logout }) {
   const handleRename = async (id) => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/update_community.php",
+        // "http://localhost:8000/api/update_community.php",
+        "https://customer-yahoo-outing.ngrok-free.dev/api/update_community.php",
         { id: id, name: editName },
       );
       if (response.data.status === "success") {
@@ -300,7 +301,8 @@ function Dashboard({ user, logout }) {
       return;
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/delete_community.php",
+        // "http://localhost:8000/api/delete_community.php",
+        "https://customer-yahoo-outing.ngrok-free.dev/api/delete_community.php",
         { id },
       );
       if (response.data.status === "success")
@@ -414,7 +416,8 @@ function Dashboard({ user, logout }) {
       setStatusMsg("Preparing download...");
 
       // Fixed the syntax error (removed leading backslash and trailing backtick)
-      const fileUrl = `http://localhost:8000/api/download.php?file=${filename}`;
+      // const fileUrl = `http://localhost:8000/api/download.php?file=${filename}`;
+      const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/api/download.php?file=${filename}`;
 
       // Create a temporary link element
       const link = document.createElement("a");
@@ -873,7 +876,8 @@ function Dashboard({ user, logout }) {
                   </div>
                   <div className="flex items-center gap-2">
                     <a
-                      href={`http://localhost:8000/uploads/${file.filename}`}
+                      // href={`http://localhost:8000/uploads/${file.filename}`}
+                      href={`https://customer-yahoo-outing.ngrok-free.dev/uploads/${file.filename}`}
                       target="_blank"
                       rel="noreferrer"
                       className="px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[10px] font-black uppercase transition-all"

@@ -368,9 +368,6 @@ The script automates the "Ground Zero" setup for **Project messyMesh**:
 		customer-yahoo-outing.ngrok-free.dev
 		rd_3E1YsA6HMMk41lr1PBivsMdvXHR
 		ngrok http 8000
-		
-		Github token:
-		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
 
 
 	    
@@ -383,7 +380,8 @@ The script automates the "Ground Zero" setup for **Project messyMesh**:
 2. **Create the Dashboard Component**
 	```Create a new file in frontend/src/Dashboard.jsx.
 _____________________________________________________________________________________________
-Temporary token:
 git add .
 git commit -m "ayappooooo unayennn"
 git push origin main
+
+

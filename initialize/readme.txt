@@ -352,13 +352,17 @@ The script automates the "Ground Zero" setup for **Project messyMesh**:
 	
 	6. Test: Launch Sequence
 
-	    Terminal 1: cd Documents/messyMesh/backend && php -S localhost:8000
+	    Terminal 1: cd Documents/messyMesh/backend && php -S localhost:8000 or php -S 127.0.0.1:8000 -t .
 	    Terminal 2: cd /usr/share/phpmyadmin && sudo php -S localhost:8080
 	    Terminal 3: cd Documents/messyMesh/frontend && npm run dev
+	    Terminal 4: cd Documents/messyMesh/ && ngrok http 8000
 	    Open browser to http://localhost:5173
 	    
 	    Additional info: where the database lives on the computer server
 	    admin:///var/lib/mysql/messymesh_db
+	    
+	    How to check:
+	    sudo ls -la /var/lib/mysql/messymesh_db
 	    
 	    
 ## Admin Dashboard and Admin access

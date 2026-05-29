@@ -10,13 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-
-// 3. Establish your standard connection to your local mysql folder
-$conn = new mysqli("127.0.0.1", "root", "amNekku2026", "messymesh_db");
-if ($conn->connect_error) {
-    die(json_encode(["error" => "Database connection offline"]));
-}
-
 require_once __DIR__ . '/../config/db_connect.php';
 
 $stmt = $pdo->query("SELECT * FROM communities ORDER BY id DESC");

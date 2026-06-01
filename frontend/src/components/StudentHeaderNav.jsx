@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 const StudentHeaderNav = ({
   username,
+  // eslint-disable-next-line no-unused-vars
   userRole = "student",
   onLogout,
   activeSection,
@@ -102,14 +103,14 @@ const StudentHeaderNav = ({
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               className="flex items-center gap-3 text-left group bg-slate-800/30 hover:bg-slate-800/60 border border-slate-700/40 px-3 py-1.5 rounded-xl transition-all select-none"
             >
-              <div className="text-right hidden sm:block">
+              {/* <div className="text-right hidden sm:block">
                 <div className="text-[11px] font-mono font-bold text-slate-300 group-hover:text-white transition-colors leading-none">
                   {username || "STUDENT"}
                 </div>
                 <div className="text-[9px] font-mono text-emerald-400 uppercase tracking-widest mt-1 leading-none font-bold">
                   {userRole}
                 </div>
-              </div>
+              </div> */}
 
               <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 group-hover:border-blue-400/40 flex items-center justify-center font-mono font-bold text-blue-400 uppercase text-[11px] transition-all">
                 {(username || "S").charAt(0)}

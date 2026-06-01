@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+// import Spline from "@splinetool/react-spline";
 import CommunityManager from "./components/CommunityManager";
 import UserManager from "./components/UserManager";
 import { DeleteIcon } from "./components/Icons.jsx";
@@ -9,6 +10,7 @@ import SearchFilters from "./components/SearchFilters";
 import CitationModal from "./components/CitationModal"; // Adjust path as needed
 import { generateAPA7 } from "./components/utils/citationHelper.js";
 import HeaderNav from "./components/HeaderNav.jsx";
+import StudentHeaderNav from "./components/StudentHeaderNav.jsx";
 import SemesterSettingsCard from "./components/SemesterSettingsCard.jsx";
 
 // const API_BASE = "http://localhost:8000/api";
@@ -16,6 +18,7 @@ const API_BASE = "https://customer-yahoo-outing.ngrok-free.dev/backend/api";
 
 function Dashboard({ user, logout }) {
   const [currentView, setCurrentView] = useState("papers");
+  const [activeSection, setActiveSection] = useState("home");
 
   // --- ALL YOUR ORIGINAL STATES (UNTOUCHED) ---
   const [files, setFiles] = useState([]);
@@ -63,6 +66,7 @@ function Dashboard({ user, logout }) {
     weeklyUsers: 0,
     monthlyUsers: 0,
     yearlyUsers: 0,
+    activeFilteredCount: null,
     dailyUploads: 0,
     weeklyUploads: 0,
     semesterLabel: "Active Semester",
@@ -192,9 +196,27 @@ function Dashboard({ user, logout }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchStats = useCallback(async () => {
+  const fetchStats = useCallback(async (filters = null) => {
     try {
-      const res = await axios.get(`${API_BASE}/get_stats.php`, ngrokConfig);
+      // Build dynamic params configuration object
+      const config = {
+        ...ngrokConfig,
+        params: {},
+      };
+
+      // If StatsBar changed a dropdown, inject them into the query params
+      if (filters && filters.timeframe) {
+        config.params = {
+          timeframe: filters.timeframe,
+          day: filters.day,
+          week: filters.week,
+          month: filters.month,
+          year: filters.year,
+        };
+      }
+
+      const res = await axios.get(`${API_BASE}/get_stats.php`, config);
+
       if (res.data.status === "success") {
         setStats(res.data.stats); // This updates the state
 
@@ -202,16 +224,38 @@ function Dashboard({ user, logout }) {
         if (res.data.stats.semesterLabel) {
           setSemLabel(res.data.stats.semesterLabel);
         }
-        // If your stats backend endpoint maps values for active dates:
-        if (res.data.stats.semesterStart)
+        if (res.data.stats.semesterStart) {
           setSemStart(res.data.stats.semesterStart);
-        if (res.data.stats.semesterEnd) setSemEnd(res.data.stats.semesterEnd);
+        }
+        if (res.data.stats.semesterEnd) {
+          setSemEnd(res.data.stats.semesterEnd);
+        }
       }
     } catch (err) {
       console.error("Stats Fetch Error:", err);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // const fetchStats = useCallback(async () => {
+  //   try {
+  //     const res = await axios.get(`${API_BASE}/get_stats.php`, ngrokConfig);
+  //     if (res.data.status === "success") {
+  //       setStats(res.data.stats); // This updates the state
+
+  //       // Auto-seed text inputs with the active values from database
+  //       if (res.data.stats.semesterLabel) {
+  //         setSemLabel(res.data.stats.semesterLabel);
+  //       }
+  //       // If your stats backend endpoint maps values for active dates:
+  //       if (res.data.stats.semesterStart)
+  //         setSemStart(res.data.stats.semesterStart);
+  //       if (res.data.stats.semesterEnd) setSemEnd(res.data.stats.semesterEnd);
+  //     }
+  //   } catch (err) {
+  //     console.error("Stats Fetch Error:", err);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   useEffect(() => {
     fetchFiles();
@@ -449,43 +493,33 @@ function Dashboard({ user, logout }) {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-8 font-sans selection:bg-blue-500/30">
-      {/* Header */}
+      {/* Header for Admins and Employees*/}
       {(user.role === "admin" || user.role === "employee") && (
         <HeaderNav
           currentView={currentView}
           setCurrentView={setCurrentView}
           adminUsername={user?.username || "Administrator"}
           onLogout={logout}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
         />
       )}
 
       {/* Header for students only */}
       {user && user.role === "student" && (
-        <div className="flex justify-between items-center mb-2 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-2xl">
-          <div>
-            <h1 className="text-2xl font-black bg-gradient-to-r from-blue-400 via-indigo-400 to-emerald-400 bg-clip-text text-transparent">
-              Hello, {user.username}
-            </h1>
-
-            <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase mt-1">
-              Status: <span className="text-emerald-500 mr-2">Active</span>
-              {/* Session_Role:{" "}
-              <span className="text-emerald-400 font-bold">{user.role}</span> */}
-            </p>
-          </div>
-
-          <button
-            onClick={logout}
-            className="px-5 py-2 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-600/20 rounded-xl font-bold text-xs transition-all tracking-widest uppercase"
-          >
-            LOGOUT
-          </button>
-        </div>
+        <StudentHeaderNav
+        username={user.username}
+        userRole={user.role}
+        onLogout={logout}
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+      />
       )}
 
       {/* Statistics: Shows only to Admins and employees */}
       {user && (user.role === "admin" || user.role === "employee") && (
-        <StatsBar stats={stats} />
+        // <StatsBar stats={stats} />
+        <StatsBar stats={stats} onFilterChange={fetchStats} />
       )}
 
       {/* METRIC PROGRESSIVE TIMELINE MONITORING BAR */}
@@ -832,7 +866,7 @@ function Dashboard({ user, logout }) {
       )}
 
       {/* REPOSITORY / VAULT VIEW */}
-      <div className="bg-slate-800/30 rounded-[2rem] border border-slate-700 p-8">
+      <div className="bg-slate-800/30 rounded-2xl md:rounded-[2rem] border border-slate-700 p-4 sm:p-8">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xs font-mono text-slate-500 uppercase tracking-widest">
             Repository Overview ({filteredFiles.length})
@@ -850,96 +884,92 @@ function Dashboard({ user, logout }) {
         />
 
         {filteredFiles.length === 0 ? (
-          <div className="py-20 text-center border-2 border-slate-800 border-dashed rounded-2xl">
-            <p className="text-slate-600 font-mono text-sm tracking-widest uppercase">
+          <div className="py-16 md:py-20 text-center border-2 border-slate-800 border-dashed rounded-2xl">
+            <p className="text-slate-600 font-mono text-xs sm:text-sm tracking-widest uppercase">
               [ No Matching Records Found ]
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3">
-            {filteredFiles.map(
-              (
-                file, // <--- Use filtered list here
-              ) => (
-                <div
-                  key={file.id}
-                  className="flex justify-between items-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-all group"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl opacity-50 group-hover:opacity-100">
-                      📄
-                    </span>
-                    <div>
-                      <p className="font-bold text-slate-200">
-                        {file.filename}
+            {filteredFiles.map((file) => (
+              <div
+                key={file.id}
+                // Responsive Switch: Uses columns on mobile, shifts to row structure on sm: screens and up
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-all group gap-4 sm:gap-2"
+              >
+                {/* FILE DETAILS */}
+                <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
+                  <span className="text-xl sm:text-2xl opacity-50 group-hover:opacity-100 shrink-0 mt-0.5 sm:mt-0">
+                    📄
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    {" "}
+                    {/* Prevents extremely long file titles from breaking layout */}
+                    <p className="font-bold text-sm sm:text-base text-slate-200 break-words line-clamp-2 sm:line-clamp-none">
+                      {file.filename}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 sm:mt-1">
+                      <p className="text-[9px] sm:text-[10px] font-mono text-slate-500 uppercase tracking-wide">
+                        UPLOADER: {file.uploaded_by}
                       </p>
-                      <div className="flex items-center gap-3 mt-1">
-                        <p className="text-[10px] font-mono text-slate-500 uppercase">
-                          UPLOADER: {file.uploaded_by}
-                        </p>
-                        <span className="text-slate-700 text-[10px]">•</span>
-                        <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-bold rounded uppercase tracking-tighter">
-                          Sector: {file.community_name || "General_Mesh"}
-                        </span>
-                      </div>
+                      <span className="hidden sm:inline text-slate-700 text-[10px]">
+                        •
+                      </span>
+                      <span className="px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] sm:text-[9px] font-bold rounded uppercase tracking-tighter">
+                        Sector: {file.community_name || "General_Mesh"}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {/* <a
-                      href={`http://localhost:8000/uploads/${file.filename}`}
-                      href={`https://customer-yahoo-outing.ngrok-free.dev/backend/uploads/${file.filename}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[10px] font-black uppercase transition-all"
-                    >
-                      View
-                    </a> */}
-
-                    <button
-                      onClick={() =>
-                        handleViewFile(
-                          file.file_name ||
-                            file.filename ||
-                            file.name ||
-                            file.path,
-                        )
-                      }
-                      className="px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[10px] font-black uppercase transition-all"
-                    >
-                      VIEW
-                    </button>
-
-                    <button
-                      onClick={() => handleDownload(file.filename)}
-                      className="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[10px] font-black uppercase transition-all"
-                    >
-                      Download
-                    </button>
-
-                    {/* Citation */}
-                    <button
-                      onClick={() => {
-                        const text = generateAPA7(file); // Runs your helper logic
-                        setActiveCitation(text); // Saves the text to show in the pop-up
-                        setShowCiteModal(true); // Opens the modal
-                      }}
-                      className="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl text-[10px] font-black uppercase transition-all"
-                    >
-                      Cite this (APA7)
-                    </button>
-
-                    {(user.role === "admin" || user.role === "employee") && (
-                      <button
-                        onClick={() => handleDeleteFile(file.id)}
-                        className="p-2 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-white rounded-xl transition-all"
-                      >
-                        <DeleteIcon />
-                      </button>
-                    )}
-                  </div>
                 </div>
-              ),
-            )}
+
+                {/* ACTIONS INTERFACE CONTAINER */}
+                {/* Uses grid layouts on mobile to form 2 uniform button rows, restores clean horizontal layout on desktop */}
+                <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-slate-700/50 sm:border-t-0">
+                  <button
+                    onClick={() =>
+                      handleViewFile(
+                        file.file_name ||
+                          file.filename ||
+                          file.name ||
+                          file.path,
+                      )
+                    }
+                    className="px-3 sm:px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                  >
+                    VIEW
+                  </button>
+
+                  <button
+                    onClick={() => handleDownload(file.filename)}
+                    className="px-3 sm:px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                  >
+                    Download
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const text = generateAPA7(file);
+                      setActiveCitation(text);
+                      setShowCiteModal(true);
+                    }}
+                    className="px-3 sm:px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                  >
+                    Cite
+                  </button>
+
+                  {/* Delete button takes up full bottom space in mobile layout variant grid if user matches access rule */}
+                  {(user.role === "admin" || user.role === "employee") && (
+                    <button
+                      onClick={() => handleDeleteFile(file.id)}
+                      className="col-span-3 sm:col-span-1 flex justify-center items-center p-2 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-white rounded-xl transition-all h-[34px] sm:h-auto mt-1 sm:mt-0"
+                      title="Delete File"
+                    >
+                      <DeleteIcon />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

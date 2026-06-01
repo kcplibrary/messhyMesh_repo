@@ -60,6 +60,48 @@ try {
     ]);
     $semester_uploads = (int)$sem_stmt->fetch()['cnt'];
 
+
+    // --- 5. DYNAMIC HISTORICAL LOOKBACK FILTER PARSING ---
+    $timeframe = isset($_GET['timeframe']) ? $_GET['timeframe'] : null;
+    $day       = isset($_GET['day']) ? (int)$_GET['day'] : (int)date('d');
+    $week      = isset($_GET['week']) ? $_GET['week'] : 'Week 1';
+    $month     = isset($_GET['month']) ? $_GET['month'] : date('m');
+    $year      = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
+
+    // Default historical baseline to the daily live count if no filters are requested yet
+    $activeFilteredCount = (int)$dailyCount;
+
+    if ($timeframe !== null) {
+        if ($timeframe === 'daily') {
+            // Filter by exactly Year, Month, and Day
+            $stmt = $pdo->prepare("SELECT COUNT(DISTINCT user_id) as total FROM user_logins WHERE YEAR(login_time) = :year AND MONTH(login_time) = :month AND DAY(login_time) = :day");
+            $stmt->execute([':year' => $year, ':month' => $month, ':day' => $day]);
+            $activeFilteredCount = (int)$stmt->fetch()['total'];
+
+        } else if ($timeframe === 'weekly') {
+            // Extract the digit from strings like "Week 3"
+            preg_match('/\d+/', $week, $matches);
+            $weekNum = isset($matches[0]) ? (int)$matches[0] : 1;
+            
+            // Group days into standard 7-day calendar bins within the specified month/year
+            $stmt = $pdo->prepare("SELECT COUNT(DISTINCT user_id) as total FROM user_logins WHERE YEAR(login_time) = :year AND MONTH(login_time) = :month AND FLOOR((DAY(login_time) - 1) / 7) + 1 = :weekNum");
+            $stmt->execute([':year' => $year, ':month' => $month, ':weekNum' => $weekNum]);
+            $activeFilteredCount = (int)$stmt->fetch()['total'];
+
+        } else if ($timeframe === 'monthly') {
+            // Filter across a whole calendar month
+            $stmt = $pdo->prepare("SELECT COUNT(DISTINCT user_id) as total FROM user_logins WHERE YEAR(login_time) = :year AND MONTH(login_time) = :month");
+            $stmt->execute([':year' => $year, ':month' => $month]);
+            $activeFilteredCount = (int)$stmt->fetch()['total'];
+
+        } else if ($timeframe === 'yearly') {
+            // Filter across an entire year
+            $stmt = $pdo->prepare("SELECT COUNT(DISTINCT user_id) as total FROM user_logins WHERE YEAR(login_time) = :year");
+            $stmt->execute([':year' => $year]);
+            $activeFilteredCount = (int)$stmt->fetch()['total'];
+        }
+    }
+
     echo json_encode([
         "status" => "success",
         "stats" => [
@@ -75,7 +117,10 @@ try {
             "dailyUploads"    => $dailyUploadsCount,
             "weeklyUploads"   => $weeklyUploadsCount,
             "semesterLabel"   => $sem_label,
-            "semesterUploads" => $semester_uploads
+            "semesterUploads" => $semester_uploads,
+            
+            // Pass the custom query selection back to your React app
+            "activeFilteredCount" => $activeFilteredCount
         ]
     ]);
 } catch (Exception $e) {

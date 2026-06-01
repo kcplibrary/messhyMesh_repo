@@ -1,9 +1,9 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, useRef } from "react";
 
-const HeaderNav = ({
-  adminUsername,
-  userRole = "admin",
+const StudentHeaderNav = ({
+  username,
+  userRole = "student",
   onLogout,
   activeSection,
   setActiveSection,
@@ -13,16 +13,13 @@ const HeaderNav = ({
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
-  // Close dropdowns on clicking outside
+  // Close dropdown overlay nodes safely upon outside viewport trigger releases
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setProfileDropdownOpen(false);
       }
-      if (
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(event.target)
-      ) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
         setMobileMenuOpen(false);
       }
     };
@@ -31,23 +28,15 @@ const HeaderNav = ({
   }, []);
 
   const navItems = [
-    { id: "home", label: "Dashboard", icon: "📊" },
-    { id: "collections", label: "Collections", icon: "📁", role: "employee" },
-    { id: "communities", label: "Communities", icon: "🌐", role: "employee" },
-    { id: "patrons", label: "Patrons", icon: "👥", role: "admin" },
+    { id: "home", label: "Home", icon: "🏠" },
+    { id: "resource_list", label: "Resource List", icon: "📚" },
     { id: "about", label: "About", icon: "ℹ️" },
   ];
 
-  const shouldRenderItem = (item) => {
-    if (!item.role) return true;
-    if (userRole === "admin") return true;
-    if (userRole === "employee" && item.role === "employee") return true;
-    return false;
-  };
-
   return (
-    <header className="w-full bg-slate-900/60 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-50 transition-all mb-6">
+    <header className="w-full bg-slate-900/60 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-50 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        
         {/* LEFT COMPONENT: BRAND ANCHOR */}
         <div
           onClick={() => {
@@ -63,32 +52,25 @@ const HeaderNav = ({
               className="w-full h-full object-contain"
               onError={(e) => {
                 e.target.style.display = "none";
-                e.target.parentNode.classList.add(
-                  "bg-gradient-to-tr",
-                  "from-blue-600",
-                  "to-indigo-500",
-                  "p-0",
-                );
-                e.target.parentNode.innerHTML =
-                  '<span class="text-white font-mono font-black text-xs">MM</span>';
+                e.target.parentNode.classList.add("bg-gradient-to-tr", "from-blue-600", "to-indigo-500", "p-0");
+                e.target.parentNode.innerHTML = '<span class="text-white font-mono font-black text-xs">MM</span>';
               }}
             />
           </div>
 
           <div>
-            <h1 className="text-sm font-black tracking-widest text-slate-100 uppercase transition-colors group-hover:text-blue-400">
+            <h1 className="text-sm font-black tracking-widest text-slate-200 uppercase transition-colors group-hover:text-blue-400 leading-none">
               KCPLIBRARY
             </h1>
-            <p className="text-[9px] font-mono text-slate-400 uppercase tracking-wider leading-none mt-0.5">
+            <p className="text-[9px] font-mono text-slate-400 uppercase tracking-wider leading-none mt-1">
               REPOSITORIUM
             </p>
           </div>
         </div>
 
-        {/* CENTER COMPONENT: RESPONSIVE UNDERLINE TABS (Desktop and Tablet Only) */}
-        {/* CENTER COMPONENT: REFINED GLOWING ROUNDED CAPSULE NAVIGATION */}
+        {/* CENTER COMPONENT: REFINED SMOOTH CAPSULE NAVIGATION (Desktop/Tablet) */}
         <nav className="hidden md:flex items-center gap-1.5 bg-slate-950/20 border border-slate-800/30 px-2 py-1.5 rounded-2xl">
-          {navItems.filter(shouldRenderItem).map((item) => {
+          {navItems.map((item) => {
             const isActive = activeSection === item.id;
             return (
               <button
@@ -103,7 +85,7 @@ const HeaderNav = ({
                 <span className="text-xs opacity-80">{item.icon}</span>
                 {item.label}
 
-                {/* Subtle decorative dot metric indicating active tab status */}
+                {/* Micro status notification dot */}
                 {isActive && (
                   <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-400 rounded-full shadow-lg shadow-blue-400" />
                 )}
@@ -114,7 +96,7 @@ const HeaderNav = ({
 
         {/* RIGHT COMPONENT: USER PROFILE HUB & MOBILE TOGGLE */}
         <div className="flex items-center gap-4">
-          {/* PROFILE HUBS BUTTON CONTAINER */}
+          
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
@@ -122,7 +104,7 @@ const HeaderNav = ({
             >
               <div className="text-right hidden sm:block">
                 <div className="text-[11px] font-mono font-bold text-slate-300 group-hover:text-white transition-colors leading-none">
-                  {adminUsername || "OPERATOR"}
+                  {username || "STUDENT"}
                 </div>
                 <div className="text-[9px] font-mono text-emerald-400 uppercase tracking-widest mt-1 leading-none font-bold">
                   {userRole}
@@ -130,20 +112,16 @@ const HeaderNav = ({
               </div>
 
               <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 group-hover:border-blue-400/40 flex items-center justify-center font-mono font-bold text-blue-400 uppercase text-[11px] transition-all">
-                {(adminUsername || "U").charAt(0)}
+                {(username || "S").charAt(0)}
               </div>
             </button>
 
-            {/* PROFILE OPTIONS DROPDOWN */}
+            {/* PROFILE OPTIONS DROPDOWN OVERLAY */}
             {profileDropdownOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-slate-900 border border-slate-700/60 rounded-xl shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-top-1.5 duration-150 backdrop-blur-xl">
                 <div className="px-3 py-2 border-b border-slate-800/80 mb-1">
-                  <p className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
-                    Signed in as
-                  </p>
-                  <p className="text-xs font-bold text-slate-300 truncate font-mono mt-0.5">
-                    {adminUsername}
-                  </p>
+                  <p className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">Signed in as</p>
+                  <p className="text-xs font-bold text-slate-300 truncate font-mono mt-0.5">{username}</p>
                 </div>
 
                 <button
@@ -152,29 +130,11 @@ const HeaderNav = ({
                     setProfileDropdownOpen(false);
                   }}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[10px] font-mono font-bold uppercase tracking-wider transition-colors ${
-                    activeSection === "edit-profile"
-                      ? "bg-blue-500/10 text-blue-400"
-                      : "text-slate-400 hover:bg-slate-800"
+                    activeSection === "edit-profile" ? "bg-blue-500/10 text-blue-400" : "text-slate-400 hover:bg-slate-800"
                   }`}
                 >
                   👤 Edit Profile
                 </button>
-
-                {userRole === "admin" && (
-                  <button
-                    onClick={() => {
-                      setActiveSection("semester");
-                      setProfileDropdownOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[10px] font-mono font-bold uppercase tracking-wider transition-colors mt-0.5 ${
-                      activeSection === "semester"
-                        ? "bg-purple-500/10 text-purple-400"
-                        : "text-slate-400 hover:bg-slate-800"
-                    }`}
-                  >
-                    ⚙️ System Config
-                  </button>
-                )}
 
                 <button
                   onClick={() => {
@@ -189,45 +149,27 @@ const HeaderNav = ({
             )}
           </div>
 
-          {/* MOBILE TOGGLE BURGER BUTTON (Visible on Mobile/Tablet Only) */}
+          {/* MOBILE RESPONSIVE HAMBURGER BUTTON */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-xl bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 text-slate-300 transition-colors"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               {mobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               )}
             </svg>
           </button>
         </div>
       </div>
 
-      {/* MOBILE MENU SLIDEOUT SIDE DRAWER OVERLAY */}
+      {/* MOBILE COLLAPSED SLIDEOUT side MENU OVERLAY */}
       {mobileMenuOpen && (
-        <div
-          className="md:hidden fixed inset-0 top-16 bg-slate-950/80 backdrop-blur-sm z-40 transition-all"
-          ref={mobileMenuRef}
-        >
+        <div className="md:hidden fixed inset-0 top-16 bg-slate-950/80 backdrop-blur-sm z-40 transition-all" ref={mobileMenuRef}>
           <div className="bg-slate-900 border-b border-slate-800 p-4 space-y-1 animate-in slide-in-from-top duration-200">
-            {navItems.filter(shouldRenderItem).map((item) => {
+            {navItems.map((item) => {
               const isActive = activeSection === item.id;
               return (
                 <button
@@ -254,4 +196,4 @@ const HeaderNav = ({
   );
 };
 
-export default HeaderNav;
+export default StudentHeaderNav;

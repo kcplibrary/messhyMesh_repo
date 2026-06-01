@@ -27,30 +27,33 @@ const UserManager = ({
   setEditPassword,
 }) => {
   return (
-    <div className="mb-12 bg-slate-800/50 p-8 rounded-3xl border border-blue-500/30 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-500">
-      <h2 className="text-xl font-black mb-8 text-white uppercase">
+    // Adjusted container padding: p-4 on phones, p-8 on medium/desktop screens (md:p-8)
+    <div className="mb-12 bg-slate-800/50 p-4 sm:p-6 md:p-8 rounded-[2rem] border border-blue-500/30 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-500">
+      <h2 className="text-lg sm:text-xl font-black mb-6 sm:mb-8 text-white uppercase">
         User Management
       </h2>
+      
+      {/* CREATION FORM: Scaled intelligently across breakpoints (1 col -> 2 cols -> 5 cols) */}
       <form
         onSubmit={handleCreateUser}
-        className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8"
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-8"
       >
         <input
           type="text"
           placeholder="Username"
-          className="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none"
+          className="bg-slate-900 border border-slate-700 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl outline-none text-white text-sm"
           value={newUsername}
           onChange={(e) => setNewUsername(e.target.value)}
         />
         <input
           type="password"
           placeholder="Password"
-          className="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none"
+          className="bg-slate-900 border border-slate-700 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl outline-none text-white text-sm"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
         />
         <select
-          className="bg-slate-900 border border-slate-700 p-4 rounded-2xl text-white outline-none"
+          className="bg-slate-900 border border-slate-700 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl text-white text-sm outline-none cursor-pointer"
           value={newRole}
           onChange={(e) => setNewRole(e.target.value)}
         >
@@ -59,9 +62,8 @@ const UserManager = ({
           <option value="admin">Admin</option>
         </select>
 
-        {/* NEW SECTOR DROPDOWN */}
         <select
-          className="bg-slate-900 border border-slate-700 p-4 rounded-2xl text-white outline-none cursor-pointer"
+          className="bg-slate-900 border border-slate-700 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl text-white text-sm outline-none cursor-pointer"
           value={selectedUserDept}
           onChange={(e) => setSelectedUserDept(e.target.value)}
         >
@@ -73,90 +75,112 @@ const UserManager = ({
           ))}
         </select>
 
-        <button className="bg-emerald-600 hover:bg-emerald-500 p-4 rounded-2xl font-black transition-all">
+        {/* Create Button: Spans across full width on mobile viewports */}
+        <button className="col-span-1 sm:col-span-2 md:col-span-1 bg-emerald-600 hover:bg-emerald-500 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl font-black transition-all text-white text-sm tracking-wide">
           CREATE
         </button>
       </form>
 
+      {/* OVERVIEW PANEL */}
       <div className="space-y-2 border-t border-slate-700 pt-6">
         <h3 className="text-[10px] font-mono text-slate-500 uppercase mb-4 tracking-widest">
           Patron Overview
         </h3>
-        <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-2">
+        
+        <div className="grid grid-cols-1 gap-2 max-h-80 overflow-y-auto pr-1">
           {usersList.map((u) => (
             <div
               key={u.id}
-              className="flex justify-between items-center bg-slate-900/50 p-3 rounded-xl border border-slate-700 hover:border-blue-500/30 transition-all group"
+              className="bg-slate-900/50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-700 hover:border-blue-500/30 transition-all group"
             >
               {editingUserId === u.id ? (
-                <div className="flex gap-2 flex-1 mr-4">
-                  <input
-                    className="bg-slate-800 border border-blue-500 rounded px-2 py-1 text-white text-[10px] w-full outline-none"
-                    value={editUsername}
-                    onChange={(e) => setEditUsername(e.target.value)}
-                  />
+                /* INLINE EDIT MODE - Responsive Flex/Grid structure prevents layout collapse */
+                <div className="flex flex-col gap-3 w-full">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">Username</label>
+                      <input
+                        className="bg-slate-800 border border-blue-500 rounded-lg px-3 py-2 text-white text-xs w-full outline-none"
+                        value={editUsername}
+                        onChange={(e) => setEditUsername(e.target.value)}
+                      />
+                    </div>
 
-                  <input
-                    type="password"
-                    placeholder="New Pass (Leave blank to keep)"
-                    className="bg-slate-800 border border-blue-500 rounded px-2 py-1 text-white text-[10px] w-32 outline-none"
-                    value={editPassword}
-                    onChange={(e) => setEditPassword(e.target.value)}
-                  />
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">Password Upgrade</label>
+                      <input
+                        type="password"
+                        placeholder="Leave blank to preserve"
+                        className="bg-slate-800 border border-blue-500 rounded-lg px-3 py-2 text-white text-xs w-full outline-none"
+                        value={editPassword}
+                        onChange={(e) => setEditPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
 
-                  <select
-                    className="bg-slate-800 border border-blue-500 rounded text-[10px] text-white outline-none px-1"
-                    value={editRole}
-                    onChange={(e) => setEditRole(e.target.value)}
-                  >
-                    <option value="student">student</option>
-                    <option value="employee">employee</option>
-                    <option value="admin">admin</option>
-                  </select>
+                  <div className="grid grid-cols-2 md:grid-cols-4 items-end gap-2 pt-1">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">Role Type</label>
+                      <select
+                        className="bg-slate-800 border border-blue-500 rounded-lg text-xs text-white outline-none px-2 py-2 cursor-pointer h-[34px]"
+                        value={editRole}
+                        onChange={(e) => setEditRole(e.target.value)}
+                      >
+                        <option value="student">student</option>
+                        <option value="employee">employee</option>
+                        <option value="admin">admin</option>
+                      </select>
+                    </div>
 
-                  {/* --- NEW DROPDOWN INSIDE EDIT MODE --- */}
-                  <select
-                    className="bg-slate-800 border border-blue-500 rounded text-[10px] text-white outline-none px-1"
-                    value={editDept ? String(editDept) : ""}
-                    onChange={(e) => setEditDept(e.target.value)}
-                  >
-                    <option value="">No Sector</option>
-                    {communities.map((c) => (
-                      <option key={c.id} value={String(c.id)}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">Sector Link</label>
+                      <select
+                        className="bg-slate-800 border border-blue-500 rounded-lg text-xs text-white outline-none px-2 py-2 cursor-pointer h-[34px]"
+                        value={editDept ? String(editDept) : ""}
+                        onChange={(e) => setEditDept(e.target.value)}
+                      >
+                        <option value="">No Sector</option>
+                        {communities.map((c) => (
+                          <option key={c.id} value={String(c.id)}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                  <button
-                    onClick={() => handleUpdateUser(u.id)}
-                    className="text-emerald-400 font-bold text-[10px] uppercase"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => setEditingUserId(null)}
-                    className="text-slate-500 font-bold text-[10px] uppercase"
-                  >
-                    Cancel
-                  </button>
+                    {/* ACTIONS SUB-WRAPPER */}
+                    <button
+                      onClick={() => handleUpdateUser(u.id)}
+                      className="bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500/20 text-emerald-400 hover:text-white rounded-lg font-bold text-xs uppercase transition-all h-[34px]"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingUserId(null)}
+                      className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-slate-200 rounded-lg font-bold text-xs uppercase transition-all h-[34px]"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <>
-                  <span className="font-bold text-slate-200 tracking-tight">
+                /* VIEW RECORD MODE - Stacks beautifully into rows on phones */
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 w-full">
+                  <span className="font-bold text-sm sm:text-base text-slate-200 tracking-tight break-all">
                     {u.username}
                   </span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-blue-400 font-mono uppercase text-[10px] bg-blue-400/10 px-2 py-1 rounded-md">
+                  
+                  <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-start sm:justify-end">
+                    <span className="text-blue-400 font-mono uppercase text-[9px] sm:text-[10px] bg-blue-400/10 px-2 py-1 rounded-md border border-blue-500/10 tracking-wide">
                       {u.role}
                     </span>
 
-                    <span className="text-emerald-400 font-mono uppercase text-[10px] bg-emerald-400/10 px-2 py-1 rounded-md border border-emerald-400/20 ml-2">
+                    <span className="text-emerald-400 font-mono uppercase text-[9px] sm:text-[10px] bg-emerald-400/10 px-2 py-1 rounded-md border border-emerald-400/20 max-w-[180px] truncate">
                       Sector: {u.department || "Unassigned"}
                     </span>
 
                     {u.id !== 1 && u.username !== "admin" ? (
-                      <>
+                      <div className="flex items-center gap-1 ml-auto sm:ml-2 pt-2 sm:pt-0 border-t border-slate-800 sm:border-0 w-full sm:w-auto justify-end">
                         <button
                           onClick={() => {
                             setEditingUserId(u.id);
@@ -164,27 +188,27 @@ const UserManager = ({
                             setEditRole(u.role);
                             setEditDept(u.community_id ? String(u.community_id) : "");
                             setEditPassword("");
-                            
-                            setEditPassword("");
                           }}
-                          className="text-slate-600 hover:text-blue-400 transition-colors"
+                          className="p-2 text-slate-500 hover:text-blue-400 hover:bg-slate-800 rounded-lg transition-all"
+                          title="Edit User"
                         >
                           <EditIcon />
                         </button>
                         <button
                           onClick={() => handleDeleteUser(u.id)}
-                          className="text-slate-600 hover:text-rose-500 transition-colors"
+                          className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all"
+                          title="Delete User"
                         >
                           <DeleteIcon />
                         </button>
-                      </>
+                      </div>
                     ) : (
-                      <span className="text-[9px] font-mono text-slate-600 border border-slate-800 px-2 py-0.5 rounded uppercase tracking-widest">
+                      <span className="text-[9px] font-mono text-slate-600 border border-slate-800 px-2 py-1 rounded uppercase tracking-widest ml-auto sm:ml-2">
                         Root_Node
                       </span>
                     )}
                   </div>
-                </>
+                </div>
               )}
             </div>
           ))}

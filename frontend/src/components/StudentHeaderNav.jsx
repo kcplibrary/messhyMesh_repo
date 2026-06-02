@@ -29,9 +29,9 @@ const StudentHeaderNav = ({
   }, []);
 
   const navItems = [
-    { id: "home", label: "Home", icon: "🏠" },
-    { id: "resource_list", label: "Resource List", icon: "📚" },
-    { id: "about", label: "About", icon: "ℹ️" },
+    { id: "home", label: "Home" },
+    { id: "resource_list", label: "Resource List" },
+    // { id: "about", label: "About", icon: "ℹ️" },
   ];
 
   return (
@@ -125,7 +125,7 @@ const StudentHeaderNav = ({
                   <p className="text-xs font-bold text-slate-300 truncate font-mono mt-0.5">{username}</p>
                 </div>
 
-                <button
+                {/* <button
                   onClick={() => {
                     setActiveSection("edit-profile");
                     setProfileDropdownOpen(false);
@@ -135,7 +135,7 @@ const StudentHeaderNav = ({
                   }`}
                 >
                   👤 Edit Profile
-                </button>
+                </button> */}
 
                 <button
                   onClick={() => {

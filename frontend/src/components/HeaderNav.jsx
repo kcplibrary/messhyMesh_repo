@@ -31,11 +31,11 @@ const HeaderNav = ({
   }, []);
 
   const navItems = [
-    { id: "home", label: "Dashboard", icon: "📊" },
-    { id: "collections", label: "Collections", icon: "📁", role: "employee" },
-    { id: "communities", label: "Communities", icon: "🌐", role: "employee" },
-    { id: "patrons", label: "Patrons", icon: "👥", role: "admin" },
-    { id: "about", label: "About", icon: "ℹ️" },
+    { id: "home", label: "Home", },
+    { id: "collections", label: "Collections", role: "employee" },
+    { id: "communities", label: "Communities",  role: "employee" },
+    { id: "patrons", label: "Patrons", role: "admin" },
+    // { id: "about", label: "About" },
   ];
 
   const shouldRenderItem = (item) => {
@@ -145,7 +145,7 @@ const HeaderNav = ({
                   </p>
                 </div>
 
-                <button
+                {/* <button
                   onClick={() => {
                     setActiveSection("edit-profile");
                     setProfileDropdownOpen(false);
@@ -157,7 +157,7 @@ const HeaderNav = ({
                   }`}
                 >
                   👤 Edit Profile
-                </button>
+                </button> */}
 
                 {userRole === "admin" && (
                   <button

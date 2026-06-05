@@ -29,8 +29,8 @@ const StudentHeaderNav = ({
   }, []);
 
   const navItems = [
-    { id: "home", label: "Home" },
-    { id: "resource_list", label: "Resource List" },
+    // { id: "home", label: "Home" },
+    // { id: "resource_list", label: "Resource List" },
     // { id: "about", label: "About", icon: "ℹ️" },
   ];
 

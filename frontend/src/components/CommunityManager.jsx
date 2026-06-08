@@ -17,7 +17,7 @@ const CommunityManager = ({
     // Adjusted padding: p-4 on phones, p-8 on medium/desktop screens (md:p-8)
     <div className="mb-12 bg-slate-800/50 p-4 sm:p-6 md:p-8 rounded-[2rem] border border-emerald-500/30 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-500">
       <h2 className="text-lg sm:text-xl font-black mb-6 sm:mb-8 text-white uppercase">
-        Initialize Community
+        Create Community
       </h2>
       
       {/* FORM: Shifts from a stacked layout on mobile to a clean row on small screens (sm:flex-row) */}
@@ -37,7 +37,7 @@ const CommunityManager = ({
       {/* EXISTING SECTORS PANEL */}
       <div className="space-y-2 border-t border-slate-700 pt-6">
         <h3 className="text-[10px] font-mono text-slate-500 uppercase mb-4 tracking-widest">
-          Existing_Sectors_In_Mesh
+          Existing Communities
         </h3>
         
         <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-1">

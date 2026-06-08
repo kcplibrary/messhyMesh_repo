@@ -204,7 +204,7 @@ const UserManager = ({
                       </div>
                     ) : (
                       <span className="text-[9px] font-mono text-slate-600 border border-slate-800 px-2 py-1 rounded uppercase tracking-widest ml-auto sm:ml-2">
-                        Root_Node
+                        ADMIN
                       </span>
                     )}
                   </div>

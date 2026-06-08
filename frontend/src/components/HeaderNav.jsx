@@ -33,7 +33,7 @@ const HeaderNav = ({
   const navItems = [
     { id: "home", label: "Home", },
     { id: "collections", label: "Collections", role: "employee" },
-    { id: "communities", label: "Communities",  role: "employee" },
+    { id: "communities", label: "Communities",  role: "admin" },
     { id: "patrons", label: "Patrons", role: "admin" },
     // { id: "about", label: "About" },
   ];

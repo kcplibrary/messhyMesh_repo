@@ -24,8 +24,8 @@ function Dashboard({ user, logout }) {
   const [files, setFiles] = useState([]);
   const [usersList, setUsersList] = useState([]);
   const [communities, setCommunities] = useState([]);
-  const [showAddUser, setShowAddUser] = useState(false);
-  const [showAddComm, setShowAddComm] = useState(false);
+  // const [showAddUser, setShowAddUser] = useState(false);
+  // const [showAddComm, setShowAddComm] = useState(false);
   const [selectedTargetComm, setSelectedTargetComm] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -491,11 +491,11 @@ function Dashboard({ user, logout }) {
     }
   };
 
-return (
+  return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-8 font-sans selection:bg-blue-500/30 relative overflow-x-hidden">
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
         <Spline scene="https://prod.spline.design/fyKP5gxeJ0N1Ae9c/scene.splinecode" />
-        
+
         {/* Overlays */}
         <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/30 pointer-events-none" />
@@ -504,15 +504,55 @@ return (
 
       {/* Foreground */}
       <div className="relative z-10 max-w-7xl mx-auto space-y-8">
+        {activeSection === "collections" && (
+          <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none opacity-40 mix-blend-screen animate-in fade-in duration-700">
+            {/* <Spline scene="https://prod.spline.design/pvk98tA5U2ehsKYW/scene.splinecode" /> */}
+            {/* <Spline scene="https://prod.spline.design/8Sx-RvYPYg4RFYj6/scene.splinecode" /> */}
+            <Spline scene="https://prod.spline.design/y9kiQ0qCdATiQ1s0/scene.splinecode" />
+
+            {/* Overlays */}
+            <div className="absolute bottom-0 right-0 w-full sm:w-[50vw] h-[25vh] bg-gradient-to-br from-transparent via-slate-950/40 to-slate-950 pointer-events-none backdrop-blur-[2px]" />
+            <div className="absolute bottom-0 right-0 w-full sm:w-96 h-25 bg-gradient-to-br from-transparent via-slate-950/80 to-slate-950 pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-full sm:w-80 h-48 bg-slate-950 pointer-events-none filter blur-xl opacity-90" />
+          </div>
+        )}
+
+        {activeSection === "communities" && (
+          <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none opacity-40 mix-blend-screen animate-in fade-in duration-700">
+            {/* <Spline scene="https://prod.spline.design/pvk98tA5U2ehsKYW/scene.splinecode" /> */}
+            <Spline scene="https://prod.spline.design/8Sx-RvYPYg4RFYj6/scene.splinecode" />
+            {/* <Spline scene="https://prod.spline.design/y9kiQ0qCdATiQ1s0/scene.splinecode" /> */}
+
+            {/* Overlays */}
+            <div className="absolute bottom-0 right-0 w-full sm:w-[50vw] h-[40vh] sm:h-[50vh] bg-gradient-to-br from-transparent via-slate-950/20 sm:via-slate-950/40 to-slate-950 pointer-events-none backdrop-blur-[2px]" />
+            <div className="absolute bottom-0 right-0 w-full sm:w-96 h-36 sm:h-48 bg-gradient-to-br from-transparent via-slate-950/60 sm:via-slate-950/80 to-slate-950 pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-full sm:w-80 h-36 sm:h-48 bg-slate-950 pointer-events-none filter blur-xl opacity-90" />
+          </div>
+        )}
+
+        {activeSection === "patrons" && (
+          <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none opacity-40 mix-blend-screen animate-in fade-in duration-700">
+            <Spline scene="https://prod.spline.design/pvk98tA5U2ehsKYW/scene.splinecode" />
+            {/* <Spline scene="https://prod.spline.design/8Sx-RvYPYg4RFYj6/scene.splinecode" /> */}
+            {/* <Spline scene="https://prod.spline.design/y9kiQ0qCdATiQ1s0/scene.splinecode" /> */}
+
+            {/* Overlays */}
+            <div className="absolute bottom-0 right-0 w-full sm:w-[50vw] h-[40vh] sm:h-[50vh] bg-gradient-to-br from-transparent via-slate-950/20 sm:via-slate-950/40 to-slate-950 pointer-events-none backdrop-blur-[2px]" />
+            <div className="absolute bottom-0 right-0 w-full sm:w-96 h-36 sm:h-48 bg-gradient-to-br from-transparent via-slate-950/60 sm:via-slate-950/80 to-slate-950 pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-full sm:w-80 h-36 sm:h-48 bg-slate-950 pointer-events-none filter blur-xl opacity-90" />
+          </div>
+        )}
+
         {/* Header for Admins and Employees */}
         {(user.role === "admin" || user.role === "employee") && (
           <HeaderNav
             currentView={currentView}
             setCurrentView={setCurrentView}
-            adminUsername={user?.username || "Administrator"}
+            adminUsername={user?.username || "admin"}
             onLogout={logout}
             activeSection={activeSection}
             setActiveSection={setActiveSection}
+            userRole={user.role}
           />
         )}
 
@@ -525,6 +565,19 @@ return (
             activeSection={activeSection}
             setActiveSection={setActiveSection}
           />
+        )}
+
+        {user && user.role === "student" && (
+          <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none opacity-40 mix-blend-screen animate-in fade-in duration-700">
+            <Spline scene="https://prod.spline.design/pvk98tA5U2ehsKYW/scene.splinecode" />
+            {/* <Spline scene="https://prod.spline.design/8Sx-RvYPYg4RFYj6/scene.splinecode" /> */}
+            {/* <Spline scene="https://prod.spline.design/y9kiQ0qCdATiQ1s0/scene.splinecode" /> */}
+
+            {/* Overlays */}
+            <div className="absolute bottom-0 right-0 w-full sm:w-[50vw] h-[40vh] sm:h-[50vh] bg-gradient-to-br from-transparent via-slate-950/20 sm:via-slate-950/40 to-slate-950 pointer-events-none backdrop-blur-[2px]" />
+            <div className="absolute bottom-0 right-0 w-full sm:w-96 h-36 sm:h-48 bg-gradient-to-br from-transparent via-slate-950/60 sm:via-slate-950/80 to-slate-950 pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-full sm:w-80 h-36 sm:h-48 bg-slate-950 pointer-events-none filter blur-xl opacity-90" />
+          </div>
         )}
 
         {/* =========================================================================
@@ -593,13 +646,17 @@ return (
                   {/* Chrono Metrics Readouts */}
                   <div className="flex gap-4 bg-slate-900/50 border border-slate-800 p-3 rounded-2xl text-left font-mono">
                     <div>
-                      <p className="text-[9px] text-slate-500 uppercase">Today</p>
+                      <p className="text-[9px] text-slate-500 uppercase">
+                        Today
+                      </p>
                       <p className="text-xs text-blue-400 font-bold">
                         +{stats.dailyUploads || 0}
                       </p>
                     </div>
                     <div className="border-l border-slate-800 pl-4">
-                      <p className="text-[9px] text-slate-500 uppercase">Weekly</p>
+                      <p className="text-[9px] text-slate-500 uppercase">
+                        Weekly
+                      </p>
                       <p className="text-xs text-indigo-400 font-bold">
                         +{stats.weeklyUploads || 0}
                       </p>
@@ -622,148 +679,105 @@ return (
         {/* Manage Cards - Accessible layout space row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 items-start">
           {/* Manage Collections Form Card */}
-          {activeSection === "collections" && (user.role === "admin" || user.role === "employee") && (
-            <div className="bg-gradient-to-b from-blue-600 to-blue-700 p-8 rounded-3xl shadow-xl shadow-blue-900/20 border border-blue-500/30 flex flex-col justify-between relative overflow-hidden transition-all duration-300 md:col-span-1 animate-in fade-in slide-in-from-top-1.5 duration-200">
-              {/* Visual Tech-Accent Bar to match the other cards */}
-              <div className="absolute top-0 left-0 right-0 h-[3px] bg-blue-400" />
+          {activeSection === "collections" &&
+            (user.role === "admin" || user.role === "employee") && (
+              <div className="bg-slate-900/70 backdrop-blur-xl p-8 rounded-3xl shadow-2xl shadow-black/50 border border-slate-800/80 hover:border-blue-500/30 flex flex-col justify-between relative overflow-hidden transition-all duration-500 md:col-span-2 w-full max-w-5xl mx-auto animate-in fade-in slide-in-from-top-1.5 duration-200">
+                {/* Tech Ambiance Glows */}
+                <div className="absolute top-0 left-0 w-80 h-80 bg-blue-500/5 rounded-full filter blur-[100px] pointer-events-none mix-blend-screen" />
+                <div className="absolute bottom-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full filter blur-[80px] pointer-events-none mix-blend-screen" />
 
-              <div className="flex flex-col gap-1.5 w-full">
-                <div className="flex justify-between items-center w-full">
-                  <span className="text-[10px] font-mono tracking-widest uppercase text-blue-200">
-                    Add new collection
+                {/* Visual Neon Accent Bar */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 via-blue-600 to-transparent opacity-60" />
+                <div className="flex flex-col gap-1.5 w-full">
+                  <div className="flex justify-between items-center w-full"></div>
+                  <span className="font-black text-xl tracking-tight uppercase text-white">
+                    Manage Collections
                   </span>
-                  <span className="text-xl">🚀</span>
+                  <p className="text-xs text-white font-normal mt-2 leading-relaxed w-full md:max-w-[70%] opacity-90">
+                    Index raw thesis manuscripts, inject searchable metadata
+                    tags, and route assets directly into secure sector vaults.
+                  </p>
                 </div>
-                <span className="font-black text-xl tracking-tight uppercase text-white">
-                  Manage Collections
-                </span>
-                <p className="text-xs text-blue-100 font-normal mt-2 leading-relaxed max-w-[240px] opacity-80">
-                  Index raw thesis manuscripts, inject searchable metadata tags,
-                  and route assets directly into secure sector vaults.
-                </p>
-              </div>
 
-              {/* METADATA INPUT ENGINE */}
-              <div className="flex flex-col gap-2 mt-4">
-                <input
-                  type="text"
-                  placeholder="FULL THESIS TITLE"
-                  value={paperTitle}
-                  onChange={(e) => setPaperTitle(e.target.value)}
-                  className="w-full bg-blue-800/50 border border-blue-400/20 text-white p-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 ring-blue-300 placeholder:text-blue-300/50 transition-all"
-                />
-                <input
-                  type="text"
-                  placeholder="AUTHOR (LASTNAME, INITIALS)"
-                  value={paperAuthor}
-                  onChange={(e) => setPaperAuthor(e.target.value)}
-                  className="w-full bg-blue-800/50 border border-blue-400/20 text-white p-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 ring-blue-300 placeholder:text-blue-300/50 transition-all"
-                />
-                <input
-                  placeholder="PUBLICATION YEAR (YYYY)"
-                  value={paperYear}
-                  onChange={(e) => setPaperYear(e.target.value)}
-                  className="w-full bg-blue-800/50 border border-blue-400/20 text-white p-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 ring-blue-300 placeholder:text-blue-300/50 transition-all"
-                />
-                <input
-                  type="text"
-                  placeholder="KEYWORDS / TAGS (COMMA SEPARATED)"
-                  value={paperKeywords}
-                  onChange={(e) => setPaperKeywords(e.target.value)}
-                  className="w-full bg-blue-800/50 border border-blue-400/20 text-white p-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 ring-blue-300 placeholder:text-blue-300/50 transition-all"
-                />
-              </div>
+                {/* METADATA INPUT ENGINE */}
+                <div className="flex flex-col gap-2 mt-4">
+                  <input
+                    type="text"
+                    placeholder="FULL THESIS TITLE"
+                    value={paperTitle}
+                    onChange={(e) => setPaperTitle(e.target.value)}
+                    className="w-full bg-blue-800/50 border border-blue-400/20 text-white p-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 ring-blue-300 placeholder:text-blue-300/50 transition-all"
+                  />
+                  <input
+                    type="text"
+                    placeholder="AUTHOR (LASTNAME, INITIALS)"
+                    value={paperAuthor}
+                    onChange={(e) => setPaperAuthor(e.target.value)}
+                    className="w-full bg-blue-800/50 border border-blue-400/20 text-white p-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 ring-blue-300 placeholder:text-blue-300/50 transition-all"
+                  />
+                  <input
+                    placeholder="PUBLICATION YEAR (YYYY)"
+                    value={paperYear}
+                    onChange={(e) => setPaperYear(e.target.value)}
+                    className="w-full bg-blue-800/50 border border-blue-400/20 text-white p-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 ring-blue-300 placeholder:text-blue-300/50 transition-all"
+                  />
+                  <input
+                    type="text"
+                    placeholder="KEYWORDS / TAGS (COMMA SEPARATED)"
+                    value={paperKeywords}
+                    onChange={(e) => setPaperKeywords(e.target.value)}
+                    className="w-full bg-blue-800/50 border border-blue-400/20 text-white p-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 ring-blue-300 placeholder:text-blue-300/50 transition-all"
+                  />
+                </div>
 
-              {/* SECTOR SELECTOR */}
-              <div className="mt-3 relative">
-                <select
-                  value={selectedTargetComm}
-                  onChange={(e) => setSelectedTargetComm(e.target.value)}
-                  className="w-full bg-blue-800 border border-blue-400/30 text-white p-3 rounded-xl text-xs font-bold outline-none focus:ring-2 ring-blue-300 transition-all cursor-pointer appearance-none"
+                {/* SECTOR SELECTOR */}
+                <div className="mt-3 relative">
+                  <select
+                    value={selectedTargetComm}
+                    onChange={(e) => setSelectedTargetComm(e.target.value)}
+                    className="w-full bg-blue-800 border border-blue-400/30 text-white p-3 rounded-xl text-xs font-bold outline-none focus:ring-2 ring-blue-300 transition-all cursor-pointer appearance-none"
+                  >
+                    <option value="">SELECT COMMUNITY</option>
+                    {communities.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* SUBMIT BUTTON TRIGGER */}
+                <label
+                  className={`mt-4 cursor-pointer group p-4 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-widest border active:scale-[0.98] w-full max-w-xs mx-auto ${
+                    selectedTargetComm
+                      ? "bg-white text-blue-600 border-white hover:bg-blue-50"
+                      : "bg-blue-800/40 text-blue-400/60 border-blue-700/40 cursor-not-allowed opacity-50"
+                  }`}
                 >
-                  <option value="">-- SELECT COMMUNITY--</option>
-                  {communities.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                  {selectedTargetComm
+                    ? "Upload Archive"
+                    : "Choose Community First"}
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                    disabled={!selectedTargetComm}
+                  />
+                </label>
               </div>
-
-              {/* SUBMIT BUTTON TRIGGER */}
-              <label
-                className={`mt-4 cursor-pointer group p-4 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-widest border active:scale-[0.98] ${
-                  selectedTargetComm
-                    ? "bg-white text-blue-600 border-white hover:bg-blue-50"
-                    : "bg-blue-800/40 text-blue-400/60 border-blue-700/40 cursor-not-allowed opacity-50"
-                }`}
-              >
-                {selectedTargetComm
-                  ? "Upload Archive"
-                  : "Choose Community First"}
-                <input
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                  disabled={!selectedTargetComm}
-                />
-              </label>
-            </div>
-          )}
+            )}
 
           {/* Manage Community Button Card */}
-          {activeSection === "communities" && (user.role === "admin" || user.role === "employee") && (
-            <button
-              onClick={() => setShowAddComm(!showAddComm)}
-              className={`p-8 rounded-3xl border text-left flex flex-col justify-between items-start group transition-all duration-300 relative overflow-hidden active:scale-[0.98] md:col-span-2 animate-in fade-in slide-in-from-top-1.5 duration-200 ${
-                showAddComm
-                  ? "bg-slate-800/90 border-emerald-500 shadow-lg shadow-emerald-950/20 text-emerald-400"
-                  : "bg-slate-800/40 border-slate-700/60 text-slate-200 hover:border-slate-600 hover:bg-slate-800/70"
-              }`}
-            >
-              {/* Visual Tech-Accent Bar */}
+          {/* {activeSection === "communities" &&
+            (user.role === "admin" || user.role === "employee") && (
               <div
-                className={`absolute top-0 left-0 right-0 h-[3px] transition-all ${showAddComm ? "bg-emerald-500" : "bg-transparent group-hover:bg-slate-500"}`}
+                className="w-full max-w-7xl -mt-30 mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-in fade-in duration-300"
+                CommunityManager
               />
-
-              <div className="flex flex-col gap-1.5 w-full">
-                <div className="flex justify-between items-center w-full">
-                  <span
-                    className={`text-[10px] font-mono tracking-widest uppercase transition-all ${showAddComm ? "text-emerald-400" : "text-slate-500 group-hover:text-slate-400"}`}
-                  >
-                    CREATE COMMUNITY
-                  </span>
-                  <span
-                    className={`text-xl transition-transform duration-300 ${showAddComm ? "rotate-45" : "group-hover:translate-x-1"}`}
-                  >
-                    {showAddComm ? "✖" : "🌐"}
-                  </span>
-                </div>
-                <span className="font-black text-xl tracking-tight uppercase">
-                  {showAddComm ? "Close Sectors" : "Manage Community"}
-                </span>
-                <p className="text-xs text-slate-400 font-normal mt-2 leading-relaxed max-w-[240px]">
-                  Configure institutional departments, college branches, and
-                  specialized course domains for thesis classification.
-                </p>
-              </div>
-
-              <div
-                className={`mt-6 px-4 py-2 rounded-xl text-[10px] font-mono font-bold uppercase tracking-widest border transition-all ${
-                  showAddComm
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 animate-pulse"
-                    : "bg-slate-800 border-slate-700 text-slate-400 group-hover:text-slate-200 group-hover:border-slate-500"
-                }`}
-              >
-                {showAddComm
-                  ? "• Click to close community"
-                  : "Click to manage community"}
-              </div>
-            </button>
-          )}
+            )} */}
 
           {/* Manage Patrons Button Card */}
-          {activeSection === "patrons" && user.role === "admin" && (
+          {/* {activeSection === "patrons" && user.role === "admin" && (
             <button
               onClick={() => setShowAddUser(!showAddUser)}
               className={`p-8 rounded-3xl border text-left flex flex-col justify-between items-start group transition-all duration-300 relative overflow-hidden active:scale-[0.98] md:col-span-2 animate-in fade-in slide-in-from-top-1.5 duration-200 ${
@@ -771,9 +785,9 @@ return (
                   ? "bg-slate-800/90 border-blue-500 shadow-lg shadow-blue-950/20 text-blue-400"
                   : "bg-slate-800/40 border-slate-700/60 text-slate-200 hover:border-slate-600 hover:bg-slate-800/70"
               }`}
-            >
-              {/* Visual Tech-Accent Bar */}
-              <div
+            > */}
+          {/* Visual Tech-Accent Bar */}
+          {/* <div
                 className={`absolute top-0 left-0 right-0 h-[3px] transition-all ${showAddUser ? "bg-blue-500" : "bg-transparent group-hover:bg-slate-500"}`}
               />
 
@@ -811,7 +825,7 @@ return (
                   : "CLICK TO MANAGE PATRON"}
               </div>
             </button>
-          )}
+          )} */}
 
           {/* Manage Semester Configuration Settings Card */}
           {activeSection === "semester" && user.role === "admin" && (
@@ -834,23 +848,26 @@ return (
         </div>
 
         {/* CALLING SEPARATE COMPONENTS */}
-        {activeSection === "communities" && showAddComm && (
-          <CommunityManager
-            handleCreateCommunity={handleCreateCommunity}
-            newCommName={newCommName}
-            setNewCommName={setNewCommName}
-            communities={communities}
-            editingId={editingId}
-            setEditingId={setEditingId}
-            editName={editName}
-            setEditName={setEditName}
-            handleRename={handleRename}
-            handleDeleteCommunity={handleDeleteCommunity}
-          />
-        )}
+        {activeSection === "communities" &&
+          (user.role === "admin" || user.role === "employee") && (
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 -mt-5 animate-in fade-in duration-300">
+              <CommunityManager
+                handleCreateCommunity={handleCreateCommunity}
+                newCommName={newCommName}
+                setNewCommName={setNewCommName}
+                communities={communities}
+                editingId={editingId}
+                setEditingId={setEditingId}
+                editName={editName}
+                setEditName={setEditName}
+                handleRename={handleRename}
+                handleDeleteCommunity={handleDeleteCommunity}
+              />
+            </div>
+          )}
 
         {/* USER SECTION */}
-        {activeSection === "patrons" && showAddUser && (
+        {activeSection === "patrons" && (
           <div className="mb-12 animate-in fade-in duration-200">
             <SearchFilters
               searchTerm={userSearch}
@@ -891,8 +908,13 @@ return (
         {/* PROFILE CONFIG EDIT MODULE ACCESS PANELS */}
         {activeSection === "edit-profile" && (
           <div className="max-w-md mx-auto p-8 text-center bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-3xl font-mono animate-in fade-in duration-200">
-            <h3 className="text-slate-200 text-xs font-bold uppercase tracking-wider">👤 Account Identity Config</h3>
-            <p className="text-[11px] text-slate-500 mt-2">Operator User: <span className="text-blue-400 font-bold">{user?.username}</span></p>
+            <h3 className="text-slate-200 text-xs font-bold uppercase tracking-wider">
+              👤 Account Identity Config
+            </h3>
+            <p className="text-[11px] text-slate-500 mt-2">
+              Operator User:{" "}
+              <span className="text-blue-400 font-bold">{user?.username}</span>
+            </p>
             <div className="mt-6 p-4 border border-dashed border-slate-800 rounded-xl text-xs text-slate-600">
               [ Profile Update UI Target Panel Container ]
             </div>
@@ -902,9 +924,13 @@ return (
         {/* SYSTEM REPOSITORY ABOUT CAP ACTIONS VIEW */}
         {activeSection === "about" && (
           <div className="max-w-xl mx-auto p-8 bg-slate-900/30 backdrop-blur-xl border border-slate-800 rounded-3xl text-center space-y-4 font-mono animate-in fade-in duration-200">
-            <h3 className="text-slate-200 font-black text-sm uppercase tracking-widest">About Repositorium</h3>
+            <h3 className="text-slate-200 font-black text-sm uppercase tracking-widest">
+              About Repositorium
+            </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              KCPLibrary Repositorium is an enterprise-grade digital web vault designed for metadata filing, asset deployment encryption, and resource collection archives.
+              KCPLibrary Repositorium is an enterprise-grade digital web vault
+              designed for metadata filing, asset deployment encryption, and
+              resource collection archives.
             </p>
             <div className="text-[10px] text-slate-600 border-t border-slate-800/80 pt-4">
               System Version v2.4.0-mesh
@@ -913,7 +939,9 @@ return (
         )}
 
         {/* REPOSITORY / VAULT VIEW - Dynamic for Collections or active asset monitoring views */}
-        {(activeSection === "collections" || activeSection === "home" || user.role === "student") && (
+        {(activeSection === "collections" ||
+          activeSection === "home" ||
+          user.role === "student") && (
           <div className="bg-slate-800/30 rounded-2xl md:rounded-[2rem] border border-slate-700 p-4 sm:p-8 animate-in fade-in slide-in-from-top-1 duration-200">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xs font-mono text-slate-500 uppercase tracking-widest">

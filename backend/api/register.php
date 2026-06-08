@@ -24,7 +24,7 @@ if ($community_id === "" || $community_id === "null") {
 }
 
 if (!$user || !$pass) {
-    echo json_encode(["status" => "error", "message" => "All fields are required"]);
+    echo json_encode(["status" => "error", "message" => "Registration rejected: Both username and password fields are required."]);
     exit;
 }
 
@@ -33,7 +33,7 @@ try {
     $check = $pdo->prepare("SELECT id FROM users WHERE username = ?");
     $check->execute([$user]);
     if ($check->fetch()) {
-        echo json_encode(["status" => "error", "message" => "Username already taken"]);
+        echo json_encode(["status" => "error", "message" => "Registration failed: The username '$user' is already taken."]);
         exit;
     }
 
@@ -45,5 +45,6 @@ try {
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(["status" => "error", "message" => "Database error: " . $e->getMessage()]);
+    echo json_encode(["status" => "error", "message" => "Database exception: Core repository engine failed to verify profile parameters."]);
 }
 ?>

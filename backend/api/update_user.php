@@ -45,7 +45,11 @@ try {
         $stmtPw->execute([$hashed, $id]);
     }
 
-    echo json_encode(["status" => "success", "message" => "Update Confirmed"]);
+    // echo json_encode(["status" => "success", "message" => "Update Confirmed"]);
+    echo json_encode(["status" => "success", "message" => "Profile configurations for '$newUsername' successfully updated."]);
 } catch (Exception $e) {
-    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+    http_response_code(500);
+    // echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+    echo json_encode(["status" => "error", "message" => "Configuration failure: Engine could not change the modification payload."]);
 }
+?>

@@ -556,6 +556,12 @@ function Dashboard({ user, logout }) {
           />
         )}
 
+        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 -mt-30 relative z-10 flex flex-col gap-6">
+          {activeSection === "patrons" && (
+            <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-300"></div>
+          )}
+        </main>
+
         {/* Header for students only */}
         {user && user.role === "student" && (
           <StudentHeaderNav

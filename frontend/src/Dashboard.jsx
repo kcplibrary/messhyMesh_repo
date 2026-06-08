@@ -12,6 +12,8 @@ import { generateAPA7 } from "./components/utils/citationHelper.js";
 import HeaderNav from "./components/HeaderNav.jsx";
 import StudentHeaderNav from "./components/StudentHeaderNav.jsx";
 import SemesterSettingsCard from "./components/SemesterSettingsCard.jsx";
+import ToastNotification from "./components/ToastNotification.jsx";
+import ConfirmationModal from "./components/ConfirmationModal.jsx";
 
 // const API_BASE = "http://localhost:8000/api";
 const API_BASE = "https://customer-yahoo-outing.ngrok-free.dev/backend/api";
@@ -55,6 +57,11 @@ function Dashboard({ user, logout }) {
   const [semStart, setSemStart] = useState("");
   const [semEnd, setSemEnd] = useState("");
   const [settingsLoading, setSettingsLoading] = useState(false);
+  const [toast, setToast] = useState({ message: null, type: "success" });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    targetId: null,
+  });
 
   // Stats check
   // const [stats, setStats] = useState({ nodes: 0, archives: 0, sectors: 0 });
@@ -265,6 +272,14 @@ function Dashboard({ user, logout }) {
   }, [fetchFiles, fetchUsers, fetchCommunities, fetchStats]);
 
   const handleUpdateUser = async (id) => {
+    if (!editUsername.trim()) {
+      setToast({
+        message: "Update failed: Username field cannot be empty.",
+        type: "error",
+      });
+      return;
+    }
+
     try {
       const res = await axios.post(`${API_BASE}/update_user.php`, {
         // id,
@@ -292,33 +307,71 @@ function Dashboard({ user, logout }) {
               : u,
           ),
         );
-        // setUsersList(
-        //   usersList.map((u) =>
-        //     u.id === id ? { ...u, username: editUsername, role: editRole } : u,
-        //   ),
-        // );
-        // setEditingUserId(null);
+
+        setToast({
+          message:
+            res.data.message ||
+            `User profile for '${editUsername}' updated successfully.`,
+          type: "success",
+        });
+      } else {
+        setToast({
+          message:
+            res.data.message || "Failed to save configuration modifications.",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error(err);
-      setStatusMsg("Update failed.");
+      // setStatusMsg("Update failed.");
+
+      setToast({
+        message:
+          "Update failed: Severe handshake exception with core database architecture.",
+        type: "error",
+      });
     }
   };
 
   const handleDeleteUser = async (id) => {
-    if (
-      !window.confirm(
-        "TERMINATE USER: This will revoke all access for this node. Continue?",
-      )
-    )
-      return;
+    // if (
+    //   !window.confirm(
+    //     "TERMINATE ACCOUNT: This will revoke all access for this repository. Continue?",
+    //   )
+    // )
+    //   return;
+
+    if (!id) return;
+
     try {
       const res = await axios.post(`${API_BASE}/delete_user.php`, { id });
-      if (res.data.status === "success")
+      if (res.data.status === "success") {
+        await fetchUsers();
         setUsersList(usersList.filter((u) => u.id !== id));
+
+        setToast({
+          message:
+            res.data.message ||
+            "User record successfully purged from repository.",
+          type: "success",
+        });
+      } else {
+        setToast({
+          message:
+            res.data.message ||
+            "Termination request refused by repository core.",
+          type: "error",
+        });
+      }
     } catch (err) {
       console.error(err);
-      setStatusMsg("Delete failed.");
+      // setStatusMsg("Delete failed.");
+      setToast({
+        message:
+          err.response?.data?.message ||
+          "Termination failed: Severe handshake exception with core server database.",
+        type: "error",
+      });
     }
   };
 
@@ -424,6 +477,16 @@ function Dashboard({ user, logout }) {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
+
+    if (!newUsername.trim() || !newPassword.trim()) {
+      setToast({
+        message:
+          "Registration failed: Both username and password fields are required.",
+        type: "error",
+      });
+      return;
+    }
+
     const params = new URLSearchParams();
     params.append("username", newUsername);
     params.append("password", newPassword);
@@ -438,11 +501,30 @@ function Dashboard({ user, logout }) {
         setNewUsername("");
         setNewPassword("");
         setSelectedUserDept("");
-        setStatusMsg(res.data.message);
+        // setStatusMsg(res.data.message);
+
+        setToast({
+          message:
+            res.data.message ||
+            `Account successfully created for ${newUsername}!`,
+          type: "success",
+        });
+      } else {
+        setToast({
+          message:
+            res.data.message || "Registration refused by repository core.",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error(err);
-      setStatusMsg("Registration failed.");
+      // setStatusMsg("Registration failed.");
+
+      setToast({
+        message:
+          "Registration failed: Unable to communicate with authentication system.",
+        type: "error",
+      });
     }
   };
 
@@ -493,6 +575,27 @@ function Dashboard({ user, logout }) {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-8 font-sans selection:bg-blue-500/30 relative overflow-x-hidden">
+      <ToastNotification
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ message: null, type: "success" })}
+      />
+
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        title="TERMINATE ACCOUNT NODE?"
+        message="Warning: This process will immediately de-provision this user asset and permanently revoke all access permissions for this data repository. This action cannot be undone."
+        confirmText="EXECUTE DELETION"
+        cancelText="ABORT"
+        isDestructive={true}
+        onCancel={() => setConfirmModal({ isOpen: false, targetId: null })}
+        onConfirm={() => {
+          // This targets the exact ID stored when the operator clicked delete in UserManager
+          handleDeleteUser(confirmModal.targetId);
+          setConfirmModal({ isOpen: false, targetId: null });
+        }}
+      />
+
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
         <Spline scene="https://prod.spline.design/fyKP5gxeJ0N1Ae9c/scene.splinecode" />
 
@@ -907,6 +1010,7 @@ function Dashboard({ user, logout }) {
               setEditDept={setEditDept}
               editPassword={editPassword}
               setEditPassword={setEditPassword}
+              setConfirmModal={setConfirmModal}
             />
           </div>
         )}

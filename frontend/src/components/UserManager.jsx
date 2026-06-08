@@ -17,7 +17,7 @@ const UserManager = ({
   editRole,
   setEditRole,
   handleUpdateUser,
-  handleDeleteUser,
+  // handleDeleteUser,
   communities,
   selectedUserDept,
   setSelectedUserDept,
@@ -25,6 +25,7 @@ const UserManager = ({
   setEditDept,
   editPassword,
   setEditPassword,
+  setConfirmModal,
 }) => {
   return (
     // Adjusted container padding: p-4 on phones, p-8 on medium/desktop screens (md:p-8)
@@ -32,7 +33,7 @@ const UserManager = ({
       <h2 className="text-lg sm:text-xl font-black mb-6 sm:mb-8 text-white uppercase">
         User Management
       </h2>
-      
+
       {/* CREATION FORM: Scaled intelligently across breakpoints (1 col -> 2 cols -> 5 cols) */}
       <form
         onSubmit={handleCreateUser}
@@ -86,7 +87,7 @@ const UserManager = ({
         <h3 className="text-[10px] font-mono text-slate-500 uppercase mb-4 tracking-widest">
           Patron Overview
         </h3>
-        
+
         <div className="grid grid-cols-1 gap-2 max-h-80 overflow-y-auto pr-1">
           {usersList.map((u) => (
             <div
@@ -98,7 +99,9 @@ const UserManager = ({
                 <div className="flex flex-col gap-3 w-full">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">Username</label>
+                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">
+                        Username
+                      </label>
                       <input
                         className="bg-slate-800 border border-blue-500 rounded-lg px-3 py-2 text-white text-xs w-full outline-none"
                         value={editUsername}
@@ -107,7 +110,9 @@ const UserManager = ({
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">Password Upgrade</label>
+                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">
+                        Password Upgrade
+                      </label>
                       <input
                         type="password"
                         placeholder="Leave blank to preserve"
@@ -120,7 +125,9 @@ const UserManager = ({
 
                   <div className="grid grid-cols-2 md:grid-cols-4 items-end gap-2 pt-1">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">Role Type</label>
+                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">
+                        Role Type
+                      </label>
                       <select
                         className="bg-slate-800 border border-blue-500 rounded-lg text-xs text-white outline-none px-2 py-2 cursor-pointer h-[34px]"
                         value={editRole}
@@ -133,7 +140,9 @@ const UserManager = ({
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">Sector Link</label>
+                      <label className="text-[9px] font-mono text-slate-500 uppercase tracking-wider pl-1">
+                        Sector Link
+                      </label>
                       <select
                         className="bg-slate-800 border border-blue-500 rounded-lg text-xs text-white outline-none px-2 py-2 cursor-pointer h-[34px]"
                         value={editDept ? String(editDept) : ""}
@@ -169,7 +178,7 @@ const UserManager = ({
                   <span className="font-bold text-sm sm:text-base text-slate-200 tracking-tight break-all">
                     {u.username}
                   </span>
-                  
+
                   <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-start sm:justify-end">
                     <span className="text-blue-400 font-mono uppercase text-[9px] sm:text-[10px] bg-blue-400/10 px-2 py-1 rounded-md border border-blue-500/10 tracking-wide">
                       {u.role}
@@ -186,7 +195,9 @@ const UserManager = ({
                             setEditingUserId(u.id);
                             setEditUsername(u.username);
                             setEditRole(u.role);
-                            setEditDept(u.community_id ? String(u.community_id) : "");
+                            setEditDept(
+                              u.community_id ? String(u.community_id) : "",
+                            );
                             setEditPassword("");
                           }}
                           className="p-2 text-slate-500 hover:text-blue-400 hover:bg-slate-800 rounded-lg transition-all"
@@ -195,7 +206,9 @@ const UserManager = ({
                           <EditIcon />
                         </button>
                         <button
-                          onClick={() => handleDeleteUser(u.id)}
+                          onClick={() =>
+                            setConfirmModal({ isOpen: true, targetId: u.id })
+                          }
                           className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all"
                           title="Delete User"
                         >

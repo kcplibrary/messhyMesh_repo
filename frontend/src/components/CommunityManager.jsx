@@ -19,9 +19,12 @@ const CommunityManager = ({
       <h2 className="text-lg sm:text-xl font-black mb-6 sm:mb-8 text-white uppercase">
         Create Community
       </h2>
-      
+
       {/* FORM: Shifts from a stacked layout on mobile to a clean row on small screens (sm:flex-row) */}
-      <form onSubmit={handleCreateCommunity} className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8">
+      <form
+        onSubmit={handleCreateCommunity}
+        className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8"
+      >
         <input
           type="text"
           placeholder="Community/Department Name"
@@ -39,7 +42,7 @@ const CommunityManager = ({
         <h3 className="text-[10px] font-mono text-slate-500 uppercase mb-4 tracking-widest">
           Existing Communities
         </h3>
-        
+
         <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-1">
           {communities.length > 0 ? (
             communities.map((c) => (
@@ -90,7 +93,7 @@ const CommunityManager = ({
                       <span className="hidden xs:inline text-emerald-400 font-mono uppercase text-[9px] sm:text-[10px] bg-emerald-400/10 px-3 py-1 rounded-md border border-emerald-400/20 group-hover:bg-emerald-400 group-hover:text-slate-900 transition-all cursor-default tracking-wide">
                         Department
                       </span>
-                      
+
                       <div className="flex items-center gap-1 ml-auto sm:ml-0">
                         <button
                           onClick={() => {

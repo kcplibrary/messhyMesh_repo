@@ -13,8 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 require_once __DIR__ . '/../config/db_connect.php';
 
-// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
-
 $data = json_decode(file_get_contents("php://input"), true);
 
 $id = $data['id'] ?? null;
@@ -23,33 +21,55 @@ $newRole = $data['role'] ?? null;
 $newDept = $data['community_id'] ?? null;
 $newPass = $data['password'] ?? null;
 
-// Convert empty string to null if no sector is selected
-$newDept = ($newDept === "") ? null : $newDept;
+// Convert empty string or string "null" to actual database null if no sector is selected
+$newDept = ($newDept === "" || $newDept === "null") ? null : $newDept;
 
+// 3. Structural validation input checks
+if (!$id || !$newUsername || !$newRole) {
+    http_response_code(400); // Bad Request
+    echo json_encode(["status" => "error", "message" => "Modification aborted: Missing required configuration keys."]);
+    exit;
+}
+
+// 4. Protection guard loop for Root Administrator Node
 if ($id == 1) {
-    echo json_encode(["status" => "error", "message" => "Root Node Protected."]);
+    http_response_code(403); // Forbidden
+    echo json_encode(["status" => "error", "message" => "Permission Denied: Root Node cannot be modified."]);
     exit;
 }
 
 try {
-    // 1. Update the main table
-    $stmt = $pdo->prepare("UPDATE users SET username = ?, role = ?, community_id = ? WHERE id = ?");
-    $stmt->execute([$newUsername, $newRole, $newDept, $id]);
+    global $pdo;
 
-    // 2. Update password ONLY if it's not empty
-    if (!empty($newPass)) {
-        // Use 'password' or 'password_hash' - check your database table structure!
-        // Also added password_hash() so the new password actually works for login.
-        $hashed = password_hash($newPass, PASSWORD_DEFAULT);
-        $stmtPw = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-        $stmtPw->execute([$hashed, $id]);
+    // 5. Dynamic Query Traffic Router Loop
+    if (!empty($newPass) && trim($newPass) !== "") {
+        // PATH A: Update text attributes INCLUDING the freshly hashed security string
+        // $hashed = password_hash(trim($newPass), PASSWORD_DEFAULT);
+        
+        // ⚠️ NOTE: If your column name is 'password_hash', change 'password = ?' below to match!
+        $stmt = $pdo->prepare("UPDATE users SET username = ?, role = ?, community_id = ?, password_hash = ? WHERE id = ?");
+        $stmt->execute([trim($newUsername), $newRole, $newDept, $newPass, $id]);
+    } else {
+        // PATH B: Update profile text attributes only (Preserves existing password cleanly!)
+        $stmt = $pdo->prepare("UPDATE users SET username = ?, role = ?, community_id = ? WHERE id = ?");
+        $stmt->execute([trim($newUsername), $newRole, $newDept, $id]);
     }
 
-    // echo json_encode(["status" => "success", "message" => "Update Confirmed"]);
-    echo json_encode(["status" => "success", "message" => "Profile configurations for '$newUsername' successfully updated."]);
+    // 6. SECURITY FIX: Sanitize output variable to stop XSS injection attacks in Toast popups
+    $cleanDisplayUser = htmlspecialchars($newUsername, ENT_QUOTES, 'UTF-8');
+    echo json_encode([
+        "status" => "success", 
+        "message" => "Profile configurations for '" . $cleanDisplayUser . "' successfully updated."
+    ]);
+
 } catch (Exception $e) {
-    http_response_code(500);
-    // echo json_encode(["status" => "error", "message" => $e->getMessage()]);
-    echo json_encode(["status" => "error", "message" => "Configuration failure: Engine could not change the modification payload."]);
+    http_response_code(500); // Internal Server Error
+    error_log("User Reconfiguration Failure: " . $e->getMessage());
+    
+    // Kept this output clear so if your table uses 'password_hash' instead of 'password', it will tell you exactly here!
+    echo json_encode([
+        "status" => "error", 
+        "message" => "Database Query Exception: " . $e->getMessage()
+    ]);
 }
 ?>

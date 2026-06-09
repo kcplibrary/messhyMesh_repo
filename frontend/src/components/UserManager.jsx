@@ -145,7 +145,7 @@ const UserManager = ({
                       </label>
                       <select
                         className="bg-slate-800 border border-blue-500 rounded-lg text-xs text-white outline-none px-2 py-2 cursor-pointer h-[34px]"
-                        value={editDept ? String(editDept) : ""}
+                        value={editDept ?? ""}
                         onChange={(e) => setEditDept(e.target.value)}
                       >
                         <option value="">No Sector</option>
@@ -195,9 +195,7 @@ const UserManager = ({
                             setEditingUserId(u.id);
                             setEditUsername(u.username);
                             setEditRole(u.role);
-                            setEditDept(
-                              u.community_id ? String(u.community_id) : "",
-                            );
+                            setEditDept(u.community_id);
                             setEditPassword("");
                           }}
                           className="p-2 text-slate-500 hover:text-blue-400 hover:bg-slate-800 rounded-lg transition-all"
@@ -207,7 +205,7 @@ const UserManager = ({
                         </button>
                         <button
                           onClick={() =>
-                            setConfirmModal({ isOpen: true, targetId: u.id })
+                            setConfirmModal({ isOpen: true, targetId: u.id, type: "user", })
                           }
                           className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all"
                           title="Delete User"

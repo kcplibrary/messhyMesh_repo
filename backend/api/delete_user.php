@@ -20,25 +20,27 @@ $id = $data['id'] ?? null;
 
 // Guard against missing parameters entirely
 if (!$id) {
+    http_response_code(400);
     echo json_encode(["status" => "error", "message" => "Termination aborted: Missing targeting element pointer."]);
     exit;
 }
 
 // check the ID
 if ($id == 1) {
+    http_response_code(403);
     echo json_encode(["status" => "error", "message" => "Permission Denied: User cannot be terminated."]);
     exit;
 }
 
-if ($id) {
-    try {
-        $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        // echo json_encode(["status" => "success", "message" => "User Node De-provisioned"]);
-        echo json_encode(["status" => "error", "message" => "User successfully removed."]);
+try {
+    global $pdo;
+
+    $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    // echo json_encode(["status" => "success", "message" => "User Node De-provisioned"]);
+    echo json_encode(["status" => "success", "message" => "User successfully removed."]);
     } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(["status" => "error", "message" => "System Error: Cannot delete user."]);
-    }
-}
+        }
 ?>

@@ -61,7 +61,9 @@ function Dashboard({ user, logout }) {
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
     targetId: null,
+    type: null,
   });
+  const [isUploading, setIsUploading] = useState(false);
 
   // Stats check
   // const [stats, setStats] = useState({ nodes: 0, archives: 0, sectors: 0 });
@@ -289,11 +291,13 @@ function Dashboard({ user, logout }) {
         community_id: editDept,
         password: editPassword,
       });
+
       if (res.data.status === "success") {
-        await fetchUsers();
+        // if (typeof fetchUsers === "function") await fetchUsers();
+        // await fetchUsers();
         setEditingUserId(null);
         setEditPassword("");
-        setStatusMsg("User node reconfigured.");
+        // setStatusMsg("User node reconfigured.");
 
         setUsersList((prev) =>
           prev.map((u) =>
@@ -314,6 +318,10 @@ function Dashboard({ user, logout }) {
             `User profile for '${editUsername}' updated successfully.`,
           type: "success",
         });
+
+        if (typeof fetchUsers === "function") await fetchUsers();
+        if (typeof fetchStats === "function") await fetchStats();
+
       } else {
         setToast({
           message:
@@ -346,7 +354,7 @@ function Dashboard({ user, logout }) {
     try {
       const res = await axios.post(`${API_BASE}/delete_user.php`, { id });
       if (res.data.status === "success") {
-        await fetchUsers();
+        if (typeof fetchUsers === "function") await fetchUsers();
         setUsersList(usersList.filter((u) => u.id !== id));
 
         setToast({
@@ -376,6 +384,14 @@ function Dashboard({ user, logout }) {
   };
 
   const handleRename = async (id) => {
+    if (!editName.trim()) {
+      setToast({
+        message: "Configuration rejected: Community name cannot be blank.",
+        type: "error",
+      });
+      return;
+    }
+
     try {
       const response = await axios.post(
         // "http://localhost:8000/api/update_community.php",
@@ -387,37 +403,87 @@ function Dashboard({ user, logout }) {
           communities.map((c) => (c.id === id ? { ...c, name: editName } : c)),
         );
         setEditingId(null);
+
+        setToast({
+          message:
+            response.data.message ||
+            `Community configuration node updated to '${editName}'.`,
+          type: "success",
+        });
+      } else {
+        setToast({
+          message:
+            response.data.message ||
+            "Modification payload rejected by core repository.",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("Rename failed.");
+      // alert("Rename failed.");
+      setToast({
+        message:
+          err.response?.data?.message ||
+          "Reconfiguration failed: Severe handshake exception with core database architecture.",
+        type: "error",
+      });
     }
   };
 
   const handleDeleteCommunity = async (id) => {
-    if (
-      !window.confirm("Are you sure you want to terminate this community node?")
-    )
-      return;
+    // if (
+    //   !window.confirm("Are you sure you want to terminate this community node?")
+    // )
+    //   return;
+
+    if (!id) return;
+
     try {
       const response = await axios.post(
         // "http://localhost:8000/api/delete_community.php",
         "https://customer-yahoo-outing.ngrok-free.dev/backend/api/delete_community.php",
         { id },
       );
-      if (response.data.status === "success")
+      if (response.data.status === "success") {
+        if (typeof fetchCommunities === "function") await fetchCommunities();
         setCommunities(communities.filter((c) => c.id !== id));
-      else alert(response.data.message);
+
+        setToast({
+          message:
+            response.data.message ||
+            "Sector records permanently purged from repository configuration.",
+          type: "success",
+        });
+      } else {
+        setToast({
+          message:
+            response.data.message ||
+            "Termination request refused by repository core.",
+          type: "error",
+        });
+      }
+      // else alert(response.data.message);
     } catch (err) {
       console.error(err);
-      alert("System Error: Could not delete community.");
+      setToast({
+        message:
+          err.response?.data?.message ||
+          "Termination failed: Severe handshake exception with core server database.",
+        type: "error",
+      });
+      // alert("System Error: Could not delete community.");
     }
   };
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file || !selectedTargetComm) {
-      setStatusMsg("SYSTEM_REJECTION: Select a Target Sector first.");
+      // setStatusMsg("SYSTEM_REJECTION: Select a Target Sector first.");
+      setToast({
+        message:
+          "SYSTEM_REJECTION: Select a Target Sector and load a file descriptor asset first.",
+        type: "error",
+      });
       return;
     }
     const formData = new FormData();
@@ -428,26 +494,56 @@ function Dashboard({ user, logout }) {
     formData.append("paper_author", paperAuthor);
     formData.append("paper_year", paperYear);
     formData.append("keywords", paperKeywords);
+
     try {
-      setStatusMsg("Routing to Sector Collection...");
-      const res = await axios.post(`${API_BASE}/upload.php`, formData);
+      setIsUploading(true);
+      // setStatusMsg("Routing to Sector Collection...");
+
+      const res = await axios.post(`${API_BASE}/upload.php`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       if (res.data.status === "success") {
-        setStatusMsg(res.data.message);
+        // setStatusMsg(res.data.message);
         fetchFiles();
 
         setPaperTitle("");
         setPaperAuthor("");
         setPaperYear("");
         setPaperKeywords("");
-
         setSelectedTargetComm("");
-        setStatusMsg("File uploaded and indexed successfully!");
-        fetchFiles();
-        fetchStats();
-      } else setStatusMsg("System Error: " + res.data.message);
+
+        setToast({
+          message:
+            res.data.message ||
+            "File uploaded and indexed into sector directory successfully!",
+          type: "success",
+        });
+      } else {
+        setToast({
+          message:
+            res.data.message ||
+            "Archive Refused: File verification validation failed.",
+          type: "error",
+        });
+      }
+
+      // setStatusMsg("File uploaded and indexed successfully!");
+      fetchFiles();
+      fetchStats();
+      // } else setStatusMsg("System Error: " + res.data.message);
     } catch (err) {
       console.error(err);
-      setStatusMsg("Archive Failed: Network/Server Error");
+      // setStatusMsg("Archive Failed: Network/Server Error");
+      setToast({
+        message:
+          err.response?.data?.message ||
+          "Archive Failed: Severe network pipeline or server engine processing exception.",
+        type: "error",
+      });
+    } finally {
+      // 6. UNLOCK BUTTON: Turn off loading state regardless of whether it succeeded or crashed
+      setIsUploading(false);
     }
   };
 
@@ -458,20 +554,68 @@ function Dashboard({ user, logout }) {
     window.open(fileUrl, "_blank");
   };
 
+  // const handleCreateCommunity = async (e) => {
+  //   e.preventDefault();
+  //   if (!newCommName.trim()) return;
+  //   try {
+  //     const res = await axios.post(`${API_BASE}/create_community.php`, {
+  //       name: newCommName,
+  //     });
+  //     setStatusMsg(res.data.message);
+  //     setNewCommName("");
+  //     fetchCommunities();
+  //   } catch (err) {
+  //     setStatusMsg(
+  //       "System Error: " + (err.response?.data?.message || "Check connection"),
+  //     );
+  //   }
+  // };
+
   const handleCreateCommunity = async (e) => {
     e.preventDefault();
-    if (!newCommName.trim()) return;
+
+    // 1. FRONTEND DATA GATING VALIDATION
+    if (!newCommName.trim()) {
+      setToast({
+        message: "Initialization rejected: Sector parameter target name cannot be empty.",
+        type: "error"
+      });
+      return;
+    }
+
     try {
       const res = await axios.post(`${API_BASE}/create_community.php`, {
-        name: newCommName,
+        name: newCommName.trim(),
       });
-      setStatusMsg(res.data.message);
-      setNewCommName("");
-      fetchCommunities();
+
+      // 2. SUCCESS HANDLING (Green Toast + Sync Re-Fetch)
+      if (res.data.status === "success") {
+        setNewCommName(""); // Reset text field cache immediately
+
+        setToast({
+          message: res.data.message || `Sector '${newCommName}' successfully initialized.`,
+          type: "success"
+        });
+
+        // Trigger dynamic system metrics data-sync refreshes
+        if (typeof fetchCommunities === "function") await fetchCommunities();
+        if (typeof fetchStats === "function") await fetchStats();
+
+      // 3. BACKEND REJECTION (Red Toast - e.g., Community name already duplicate)
+      } else {
+        setToast({
+          message: res.data.message || "Initialization aborted: Core database engine rejected the payload.",
+          type: "error"
+        });
+      }
+
+    // 4. HARDWARE/NETWORK BREAKAGE HANDLERS (Red Toast)
     } catch (err) {
-      setStatusMsg(
-        "System Error: " + (err.response?.data?.message || "Check connection"),
-      );
+      console.error(err);
+      setToast({
+        message: err.response?.data?.message || "System Error: Severe handshake exception during sector initialization.",
+        type: "error"
+      });
     }
   };
 
@@ -529,27 +673,53 @@ function Dashboard({ user, logout }) {
   };
 
   const handleDeleteFile = async (id) => {
-    if (
-      !window.confirm(
-        "PURGE ARCHIVE: Are you sure you want to permanently delete this file?",
-      )
-    )
-      return;
+    if (!id) return;
+    // if (
+    //   !window.confirm(
+    //     "PURGE ARCHIVE: Are you sure you want to permanently delete this file?",
+    //   )
+    // )
+    //   return;
+
     try {
       const res = await axios.post(`${API_BASE}/delete_file.php`, { id });
       if (res.data.status === "success") {
         setFiles(files.filter((f) => f.id !== id));
-        setStatusMsg("File successfully purged from vault.");
+        // setStatusMsg("File successfully purged from vault.");
+
+        setToast({
+          message:
+            res.data.message ||
+            "Asset successfully purged from the repository vault.",
+          type: "success",
+        });
+
+        // Trigger dynamic system metrics data-sync refreshes
+        if (typeof fetchFiles === "function") await fetchFiles();
+        if (typeof fetchStats === "function") await fetchStats();
+      } else {
+        setToast({
+          message:
+            res.data.message ||
+            "Purge Refused: Target asset locked or write-protected.",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error(err);
-      setStatusMsg("Purge Failed: System error.");
+      // setStatusMsg("Purge Failed: System error.");
+      setToast({
+        message:
+          err.response?.data?.message ||
+          "Purge Failed: Handshake exception with server core.",
+        type: "error",
+      });
     }
   };
 
   const handleDownload = async (filename) => {
     try {
-      setStatusMsg("Preparing download...");
+      // setStatusMsg("Preparing download...");
 
       // Fixed the syntax error (removed leading backslash and trailing backtick)
       // const fileUrl = `http://localhost:8000/api/download.php?file=${filename}`;
@@ -566,10 +736,18 @@ function Dashboard({ user, logout }) {
 
       // Cleanup
       document.body.removeChild(link);
-      setStatusMsg("Download initiated.");
+      // setStatusMsg("Download initiated.");
+      setToast({
+        message: `Download initiated successfully for '${filename}'.`,
+        type: "success",
+      });
     } catch (err) {
       console.error("Download error:", err);
-      setStatusMsg("Download failed: Connection error.");
+      // setStatusMsg("Download failed: Connection error.");
+      setToast({
+        message: "Download failed: High-latency handshake rejection with data asset repository.",
+        type: "error",
+      });
     }
   };
 
@@ -583,16 +761,37 @@ function Dashboard({ user, logout }) {
 
       <ConfirmationModal
         isOpen={confirmModal.isOpen}
-        title="TERMINATE ACCOUNT NODE?"
-        message="Warning: This process will immediately de-provision this user asset and permanently revoke all access permissions for this data repository. This action cannot be undone."
-        confirmText="EXECUTE DELETION"
+        title={
+          confirmModal.type === "community"
+            ? "TERMINATE COMMUNITY NODE?"
+            : confirmModal.type === "file"
+              ? "PURGE FILE ASSET FROM VAULT?"
+              : "TERMINATE USER NODE?"
+        }
+        message={
+          confirmModal.type === "community"
+            ? "Warning: This process will permanently dissolve this community sector block. Any connection links mapped here will be severed. This action cannot be undone."
+            : confirmModal.type === "file"
+              ? "Warning: This process will permanently erase this file asset binary from server storage disks and wipe its metadata indexing data row. This action cannot be undone."
+              : "Warning: This process will immediately de-provision this user asset and permanently revoke all repository access permissions. This action cannot be undone."
+        }
+        confirmText="EXECUTE PURGE"
         cancelText="ABORT"
         isDestructive={true}
-        onCancel={() => setConfirmModal({ isOpen: false, targetId: null })}
-        onConfirm={() => {
-          // This targets the exact ID stored when the operator clicked delete in UserManager
-          handleDeleteUser(confirmModal.targetId);
-          setConfirmModal({ isOpen: false, targetId: null });
+        onCancel={() =>
+          setConfirmModal({ isOpen: false, targetId: null, type: null })
+        }
+        onConfirm={async () => {
+          // 🧠 The Dynamic Traffic Router Loop:
+          if (confirmModal.type === "community") {
+            await handleDeleteCommunity(confirmModal.targetId);
+          } else if (confirmModal.type === "file") {
+            await handleDeleteFile(confirmModal.targetId); // 👈 Executes our upgraded file loop!
+          } else {
+            await handleDeleteUser(confirmModal.targetId);
+          }
+
+          setConfirmModal({ isOpen: false, targetId: null, type: null });
         }}
       />
 
@@ -857,20 +1056,26 @@ function Dashboard({ user, logout }) {
 
                 {/* SUBMIT BUTTON TRIGGER */}
                 <label
-                  className={`mt-4 cursor-pointer group p-4 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-widest border active:scale-[0.98] w-full max-w-xs mx-auto ${
-                    selectedTargetComm
-                      ? "bg-white text-blue-600 border-white hover:bg-blue-50"
-                      : "bg-blue-800/40 text-blue-400/60 border-blue-700/40 cursor-not-allowed opacity-50"
+                  className={`mt-4 group p-4 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-widest border active:scale-[0.98] w-full max-w-xs mx-auto ${
+                    isUploading
+                      ? "bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed animate-pulse" // 👈 Loading State Appearance
+                      : selectedTargetComm
+                        ? "bg-white text-blue-600 border-white hover:bg-blue-50 cursor-pointer" // 👈 Active State Appearance
+                        : "bg-blue-800/40 text-blue-400/60 border-blue-700/40 cursor-not-allowed opacity-50" // 👈 Idle Guard Appearance
                   }`}
                 >
-                  {selectedTargetComm
-                    ? "Upload Archive"
-                    : "Choose Community First"}
+                  {/* 🧠 DYNAMIC TEXT LOGIC TRAFFIC HANDLER */}
+                  {isUploading
+                    ? "Routing to Sector Archive..."
+                    : selectedTargetComm
+                      ? "Upload Archive"
+                      : "Choose Community First"}
+
                   <input
                     type="file"
                     className="hidden"
                     onChange={handleFileUpload}
-                    disabled={!selectedTargetComm}
+                    disabled={!selectedTargetComm || isUploading} // 👈 Locks up the file input handler completely during submission
                   />
                 </label>
               </div>
@@ -971,6 +1176,7 @@ function Dashboard({ user, logout }) {
                 setEditName={setEditName}
                 handleRename={handleRename}
                 handleDeleteCommunity={handleDeleteCommunity}
+                setConfirmModal={setConfirmModal}
               />
             </div>
           )}
@@ -1146,9 +1352,15 @@ function Dashboard({ user, logout }) {
                       {/* Delete button takes up full bottom space in mobile layout variant grid if user matches access rule */}
                       {(user.role === "admin" || user.role === "employee") && (
                         <button
-                          onClick={() => handleDeleteFile(file.id)}
-                          className="col-span-3 sm:col-span-1 flex justify-center items-center p-2 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-white rounded-xl transition-all h-[34px] sm:h-auto mt-1 sm:mt-0"
-                          title="Delete File"
+                          onClick={() =>
+                            setConfirmModal({
+                              isOpen: true,
+                              targetId: file.id,
+                              type: "file",
+                            })
+                          }
+                          className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all"
+                          title="Purge File Asset"
                         >
                           <DeleteIcon />
                         </button>

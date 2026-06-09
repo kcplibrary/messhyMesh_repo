@@ -19,13 +19,26 @@ $data = json_decode(file_get_contents("php://input"), true);
 $id = $data['id'] ?? null;
 $newName = $data['name'] ?? null;
 
-if ($id && $newName) {
-    try {
-        $stmt = $pdo->prepare("UPDATE communities SET name = :name WHERE id = :id");
-        $stmt->execute([':name' => $newName, ':id' => $id]);
-        echo json_encode(["status" => "success", "message" => "Sector Renamed"]);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(["status" => "error", "message" => $e->getMessage()]);
-    }
+if (!$id || !$newName || trim($newName) === "") {
+    http_response_code(400);
+    echo json_encode(["status" => "error", "message" => "Modification aborted: Missing target node identifier or value pointer."]);
+    exit;
 }
+
+try {
+    global $pdo;
+    
+    $stmt = $pdo->prepare("UPDATE communities SET name = :name WHERE id = :id");
+    $stmt->execute([':name' => trim($newName), ':id' => $id]);
+    
+    // Modernized phrasing that flows cleanly into your green ToastNotification component
+    echo json_encode(["status" => "success", "message" => "Community successfully reconfigured to '" . trim($newName) . "'."]);
+
+} catch (Exception $e) {
+    // Force Axios into its catch(err) block
+    http_response_code(500);
+    
+    // SECURITY FIX: Hide raw SQL structural syntax errors from showing up inside your premium UI layout layers
+    echo json_encode(["status" => "error", "message" => "Modification exception: Core database engine refused to update sector entry metadata safely."]);
+}
+?>

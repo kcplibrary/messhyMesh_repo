@@ -11,7 +11,8 @@ const CommunityManager = ({
   editName,
   setEditName,
   handleRename,
-  handleDeleteCommunity,
+  // handleDeleteCommunity,
+  setConfirmModal,
 }) => {
   return (
     // Adjusted padding: p-4 on phones, p-8 on medium/desktop screens (md:p-8)
@@ -106,7 +107,13 @@ const CommunityManager = ({
                           <EditIcon />
                         </button>
                         <button
-                          onClick={() => handleDeleteCommunity(c.id)}
+                          onClick={() =>
+                            setConfirmModal({
+                              isOpen: true,
+                              targetId: c.id, // 👈 Tied to 'c.id' inside your .map() loop
+                              type: "community", // 👈 Tells your central dashboard to fire handleDeleteCommunity
+                            })
+                          }
                           className="text-slate-500 hover:text-red-500 hover:bg-slate-800 p-2 rounded-lg transition-all"
                           title="Terminate Node"
                         >

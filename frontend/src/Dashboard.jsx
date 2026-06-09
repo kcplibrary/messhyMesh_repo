@@ -1064,7 +1064,7 @@ function Dashboard({ user, logout }) {
                         : "bg-blue-800/40 text-blue-400/60 border-blue-700/40 cursor-not-allowed opacity-50" // 👈 Idle Guard Appearance
                   }`}
                 >
-                  {/* 🧠 DYNAMIC TEXT LOGIC TRAFFIC HANDLER */}
+                  {/* DYNAMIC TEXT LOGIC TRAFFIC HANDLER */}
                   {isUploading
                     ? "Routing to Sector Archive..."
                     : selectedTargetComm

@@ -171,7 +171,7 @@ const HeaderNav = ({
                         : "text-slate-400 hover:bg-slate-800"
                     }`}
                   >
-                    ⚙️ System Config
+                    ⚙️ Semester Configuration
                   </button>
                 )}
 

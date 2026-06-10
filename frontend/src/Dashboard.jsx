@@ -1229,7 +1229,7 @@ function Dashboard({ user, logout }) {
         {/* CALLING SEPARATE COMPONENTS */}
         {activeSection === "communities" &&
           (user.role === "admin" || user.role === "employee") && (
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 -mt-5 animate-in fade-in duration-300">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 -mt-5 animate-in fade-in duration-300 -mt-18">
               <CommunityManager
                 handleCreateCommunity={handleCreateCommunity}
                 newCommName={newCommName}
@@ -1265,7 +1265,7 @@ function Dashboard({ user, logout }) {
 
         {/* USER SECTION */}
         {activeSection === "patrons" && (
-          <div className="mb-12 animate-in fade-in duration-200">
+          <div className="mb-12 animate-in fade-in duration-200 -mt-15">
             <SearchFilters
               searchTerm={userSearch}
               setSearchTerm={setUserSearch}
@@ -1340,7 +1340,7 @@ function Dashboard({ user, logout }) {
         {(activeSection === "collections" ||
           activeSection === "home" ||
           user.role === "student") && activeSection !== "ebooks" && (
-          <div className="bg-slate-800/30 rounded-2xl md:rounded-[2rem] border border-slate-700 p-4 sm:p-8 animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="bg-slate-800/30 rounded-2xl md:rounded-[2rem] border border-slate-700 p-4 sm:p-8 animate-in fade-in slide-in-from-top-1 duration-200 -mt-5">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xs font-mono text-slate-500 uppercase tracking-widest">
                 Repository Overview ({filteredFiles.length})

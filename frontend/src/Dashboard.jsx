@@ -14,6 +14,7 @@ import StudentHeaderNav from "./components/StudentHeaderNav.jsx";
 import SemesterSettingsCard from "./components/SemesterSettingsCard.jsx";
 import ToastNotification from "./components/ToastNotification.jsx";
 import ConfirmationModal from "./components/ConfirmationModal.jsx";
+import EbookManager from "./components/EbookManager.jsx";
 
 // const API_BASE = "http://localhost:8000/api";
 const API_BASE = "https://customer-yahoo-outing.ngrok-free.dev/backend/api";
@@ -64,6 +65,7 @@ function Dashboard({ user, logout }) {
     type: null,
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [ebooksList, setEbooksList] = useState([]);
 
   // Stats check
   // const [stats, setStats] = useState({ nodes: 0, archives: 0, sectors: 0 });
@@ -180,6 +182,17 @@ function Dashboard({ user, logout }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const fetchEbooks = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/get_ebooks.php`, ngrokConfig);
+      if (Array.isArray(res.data)) setEbooksList(res.data);
+    } catch (err) {
+      console.error(err);
+      setStatusMsg("Ebook data synchronization failed.");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const fetchUsers = useCallback(async () => {
     try {
       const res = await axios.get(`${API_BASE}/get_users.php`, ngrokConfig);
@@ -271,7 +284,8 @@ function Dashboard({ user, logout }) {
     fetchUsers();
     fetchCommunities();
     fetchStats();
-  }, [fetchFiles, fetchUsers, fetchCommunities, fetchStats]);
+    fetchEbooks();
+  }, [fetchFiles, fetchUsers, fetchCommunities, fetchStats, fetchEbooks]);
 
   const handleUpdateUser = async (id) => {
     if (!editUsername.trim()) {
@@ -321,7 +335,6 @@ function Dashboard({ user, logout }) {
 
         if (typeof fetchUsers === "function") await fetchUsers();
         if (typeof fetchStats === "function") await fetchStats();
-
       } else {
         setToast({
           message:
@@ -548,9 +561,24 @@ function Dashboard({ user, logout }) {
   };
 
   const handleViewFile = (filename) => {
+    if (!filename) {
+      setToast({ message: "VIEW_ERROR: Collections identifier missing.", type: "error" });
+      return;
+    }
+
     // Added &ngrok-skip-browser-warning=true directly to the URL structure
     const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/view_file.php?file=${encodeURIComponent(filename)}&ngrok-skip-browser-warning=true`;
+    window.open(fileUrl, "_blank");
+  };
 
+// 📚 Dedicated Document Engine for Ebooks & Textbooks
+  const handleViewEbook = (filename) => {
+    if (!filename) {
+      setToast({ message: "VIEW_ERROR: Ebook identifier missing.", type: "error" });
+      return;
+    }
+    // Connects directly to your view_ebooks.php backend script file!
+    const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/view_ebooks.php?file=${encodeURIComponent(filename)}&ngrok-skip-browser-warning=true`;
     window.open(fileUrl, "_blank");
   };
 
@@ -577,8 +605,9 @@ function Dashboard({ user, logout }) {
     // 1. FRONTEND DATA GATING VALIDATION
     if (!newCommName.trim()) {
       setToast({
-        message: "Initialization rejected: Sector parameter target name cannot be empty.",
-        type: "error"
+        message:
+          "Initialization rejected: Sector parameter target name cannot be empty.",
+        type: "error",
       });
       return;
     }
@@ -593,28 +622,34 @@ function Dashboard({ user, logout }) {
         setNewCommName(""); // Reset text field cache immediately
 
         setToast({
-          message: res.data.message || `Sector '${newCommName}' successfully initialized.`,
-          type: "success"
+          message:
+            res.data.message ||
+            `Sector '${newCommName}' successfully initialized.`,
+          type: "success",
         });
 
         // Trigger dynamic system metrics data-sync refreshes
         if (typeof fetchCommunities === "function") await fetchCommunities();
         if (typeof fetchStats === "function") await fetchStats();
 
-      // 3. BACKEND REJECTION (Red Toast - e.g., Community name already duplicate)
+        // 3. BACKEND REJECTION (Red Toast - e.g., Community name already duplicate)
       } else {
         setToast({
-          message: res.data.message || "Initialization aborted: Core database engine rejected the payload.",
-          type: "error"
+          message:
+            res.data.message ||
+            "Initialization aborted: Core database engine rejected the payload.",
+          type: "error",
         });
       }
 
-    // 4. HARDWARE/NETWORK BREAKAGE HANDLERS (Red Toast)
+      // 4. HARDWARE/NETWORK BREAKAGE HANDLERS (Red Toast)
     } catch (err) {
       console.error(err);
       setToast({
-        message: err.response?.data?.message || "System Error: Severe handshake exception during sector initialization.",
-        type: "error"
+        message:
+          err.response?.data?.message ||
+          "System Error: Severe handshake exception during sector initialization.",
+        type: "error",
       });
     }
   };
@@ -745,7 +780,8 @@ function Dashboard({ user, logout }) {
       console.error("Download error:", err);
       // setStatusMsg("Download failed: Connection error.");
       setToast({
-        message: "Download failed: High-latency handshake rejection with data asset repository.",
+        message:
+          "Download failed: High-latency handshake rejection with data asset repository.",
         type: "error",
       });
     }
@@ -782,17 +818,46 @@ function Dashboard({ user, logout }) {
           setConfirmModal({ isOpen: false, targetId: null, type: null })
         }
         onConfirm={async () => {
-          // 🧠 The Dynamic Traffic Router Loop:
           if (confirmModal.type === "community") {
             await handleDeleteCommunity(confirmModal.targetId);
           } else if (confirmModal.type === "file") {
-            await handleDeleteFile(confirmModal.targetId); // 👈 Executes our upgraded file loop!
+            await handleDeleteFile(confirmModal.targetId);
+          } else if (confirmModal.type === "ebook") {
+            try {
+              const res = await axios.post(`${API_BASE}/delete_ebook.php`, {
+                id: confirmModal.targetId,
+              });
+              if (res.data.status === "success") {
+                setEbooksList(
+                  ebooksList.filter((b) => b.id !== confirmModal.targetId),
+                );
+                setToast({
+                  message: "Ebook deleted from vault.",
+                  type: "success",
+                });
+                fetchStats();
+              }
+            } catch (err) {
+              console.error(err);
+              setToast({ message: "Purge execution failure.", type: "error" });
+            }
           } else {
             await handleDeleteUser(confirmModal.targetId);
           }
-
           setConfirmModal({ isOpen: false, targetId: null, type: null });
         }}
+        // onConfirm={async () => {
+        //   // 🧠 The Dynamic Traffic Router Loop:
+        //   if (confirmModal.type === "community") {
+        //     await handleDeleteCommunity(confirmModal.targetId);
+        //   } else if (confirmModal.type === "file") {
+        //     await handleDeleteFile(confirmModal.targetId); // 👈 Executes our upgraded file loop!
+        //   } else {
+        //     await handleDeleteUser(confirmModal.targetId);
+        //   }
+
+        //   setConfirmModal({ isOpen: false, targetId: null, type: null });
+        // }}
       />
 
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
@@ -1181,6 +1246,23 @@ function Dashboard({ user, logout }) {
             </div>
           )}
 
+        {/* EBOOK SECTION CONDITIONAL TRIGGER MOUNT */}
+        {activeSection === "ebooks" && (
+          <div className="mb-12 animate-in fade-in duration-200">
+            <EbookManager
+              user={user}
+              communities={communities}
+              ebooksList={ebooksList}
+              fetchEbooks={fetchEbooks}
+              fetchStats={fetchStats}
+              setToast={setToast}
+              setConfirmModal={setConfirmModal}
+              API_BASE={API_BASE}
+              handleViewEbook={handleViewEbook}
+            />
+          </div>
+        )}
+
         {/* USER SECTION */}
         {activeSection === "patrons" && (
           <div className="mb-12 animate-in fade-in duration-200">
@@ -1257,7 +1339,7 @@ function Dashboard({ user, logout }) {
         {/* REPOSITORY / VAULT VIEW - Dynamic for Collections or active asset monitoring views */}
         {(activeSection === "collections" ||
           activeSection === "home" ||
-          user.role === "student") && (
+          user.role === "student") && activeSection !== "ebooks" && (
           <div className="bg-slate-800/30 rounded-2xl md:rounded-[2rem] border border-slate-700 p-4 sm:p-8 animate-in fade-in slide-in-from-top-1 duration-200">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xs font-mono text-slate-500 uppercase tracking-widest">
@@ -1331,12 +1413,14 @@ function Dashboard({ user, logout }) {
                         VIEW
                       </button>
 
-                      <button
-                        onClick={() => handleDownload(file.filename)}
-                        className="px-3 sm:px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
-                      >
-                        Download
-                      </button>
+                      {(user.role === "admin" || user.role === "employee") && (
+                        <button
+                          onClick={() => handleDownload(file.filename)}
+                          className="px-3 sm:px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                        >
+                          Download
+                        </button>
+                      )}
 
                       <button
                         onClick={() => {

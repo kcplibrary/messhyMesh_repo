@@ -32,6 +32,8 @@ const StudentHeaderNav = ({
     // { id: "home", label: "Home" },
     // { id: "resource_list", label: "Resource List" },
     // { id: "about", label: "About", icon: "ℹ️" },
+    { id: "home", label: "Research Papers", icon: "📄" },
+    { id: "ebooks", label: "Ebooks", icon: "📚" },
   ];
 
   return (

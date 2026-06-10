@@ -33,6 +33,7 @@ const HeaderNav = ({
   const navItems = [
     { id: "home", label: "Home", },
     { id: "collections", label: "Collections", role: "employee" },
+    { id: "ebooks", label: "Ebooks"},
     { id: "communities", label: "Communities",  role: "admin" },
     { id: "patrons", label: "Patrons", role: "admin" },
     // { id: "about", label: "About" },
@@ -46,7 +47,7 @@ const HeaderNav = ({
   };
 
   return (
-    <header className="w-full bg-slate-900/60 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-50 transition-all mb-6">
+    <header className="w-full bg-slate-900/60 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-50 transition-all mb-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* LEFT COMPONENT: BRAND ANCHOR */}
         <div

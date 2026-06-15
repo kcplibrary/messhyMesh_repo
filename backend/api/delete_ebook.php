@@ -25,7 +25,7 @@ if ($fileId) {
 
         if ($file) {
             // Absolute path targeting your isolated textbooks storage sub-folder partition
-            $filePath = '/home/kcplibrary/Documents/messyMesh/backend/uploads/ebooks/' . $file['filename'];
+            $filePath = '/../uploads/ebooks/' . $file['filename'];
             
             // Clear out the physical binary document asset from server storage space
             if (file_exists($filePath)) {

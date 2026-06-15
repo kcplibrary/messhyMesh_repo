@@ -718,10 +718,10 @@ function Dashboard({ user, logout }) {
         isOpen={confirmModal.isOpen}
         title={
           confirmModal.type === "community"
-            ? "TERMINATE COMMUNITY NODE?"
+            ? "TERMINATE COMMUNITY?"
             : confirmModal.type === "file"
-              ? "PURGE FILE ASSET FROM VAULT?"
-              : "TERMINATE USER NODE?"
+              ? "PURGE ITEM FROM REPOSITORY?"
+              : "TERMINATE USER?"
         }
         message={
           confirmModal.type === "community"

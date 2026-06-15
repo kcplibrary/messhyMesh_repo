@@ -57,7 +57,7 @@ const UserManager = ({
           onChange={(e) => setNewRole(e.target.value)}
         >
           <option value="student">Student</option>
-          <option value="employee">Employee</option>
+          <option value="employee">Staff</option>
           <option value="admin">Admin</option>
         </select>
 

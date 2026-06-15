@@ -23,7 +23,7 @@ if ($fileId) {
         $file = $stmt->fetch();
 
         if ($file) {
-            $filePath = __DIR__ . '/../uploads/' . $file['filename'];
+            $filePath = __DIR__ . '/home/kcplibrary/Documents/messyMesh/backend/uploads/' . $file['filename'];
             
             // Delete the physical file
             if (file_exists($filePath)) {

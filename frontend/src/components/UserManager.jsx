@@ -28,13 +28,11 @@ const UserManager = ({
   setConfirmModal,
 }) => {
   return (
-    // Adjusted container padding: p-4 on phones, p-8 on medium/desktop screens (md:p-8)
     <div className="mb-12 bg-slate-800/50 p-4 sm:p-6 md:p-8 rounded-[2rem] border border-blue-500/30 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-500">
       <h2 className="text-lg sm:text-xl font-black mb-6 sm:mb-8 text-white uppercase">
         User Management
       </h2>
 
-      {/* CREATION FORM: Scaled intelligently across breakpoints (1 col -> 2 cols -> 5 cols) */}
       <form
         onSubmit={handleCreateUser}
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-8"
@@ -76,13 +74,12 @@ const UserManager = ({
           ))}
         </select>
 
-        {/* Create Button: Spans across full width on mobile viewports */}
         <button className="col-span-1 sm:col-span-2 md:col-span-1 bg-emerald-600 hover:bg-emerald-500 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl font-black transition-all text-white text-sm tracking-wide">
           CREATE
         </button>
       </form>
 
-      {/* OVERVIEW PANEL */}
+      {/* Overview panel */}
       <div className="space-y-2 border-t border-slate-700 pt-6">
         <h3 className="text-[10px] font-mono text-slate-500 uppercase mb-4 tracking-widest">
           Patron Overview
@@ -95,7 +92,6 @@ const UserManager = ({
               className="bg-slate-900/50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-700 hover:border-blue-500/30 transition-all group"
             >
               {editingUserId === u.id ? (
-                /* INLINE EDIT MODE - Responsive Flex/Grid structure prevents layout collapse */
                 <div className="flex flex-col gap-3 w-full">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div className="flex flex-col gap-1">
@@ -157,7 +153,7 @@ const UserManager = ({
                       </select>
                     </div>
 
-                    {/* ACTIONS SUB-WRAPPER */}
+                    {/* Actions sub-wrapper */}
                     <button
                       onClick={() => handleUpdateUser(u.id)}
                       className="bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500/20 text-emerald-400 hover:text-white rounded-lg font-bold text-xs uppercase transition-all h-[34px]"
@@ -173,7 +169,7 @@ const UserManager = ({
                   </div>
                 </div>
               ) : (
-                /* VIEW RECORD MODE - Stacks beautifully into rows on phones */
+                /* View record mode */
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 w-full">
                   <span className="font-bold text-sm sm:text-base text-slate-200 tracking-tight break-all">
                     {u.username}

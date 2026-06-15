@@ -12,7 +12,7 @@ export default function EbookManager({
   setToast,
   setConfirmModal,
   API_BASE,
-  handleViewEbook, // 🧠 FIX: Accept the dedicated ebook viewer handler function from parent
+  handleViewEbook,
 }) {
   const [bookTitle, setBookTitle] = useState("");
   const [bookAuthor, setBookAuthor] = useState("");
@@ -111,7 +111,7 @@ export default function EbookManager({
 
   return (
     <div className="space-y-6 md:space-y-8 animate-in fade-in duration-200 -mt-12">
-      {/* Upload Manager Panel - Visible only to Staff Nodes */}
+      {/* Upload Manager Panel - Visible only to staff Nodes */}
       {(user.role === "admin" || user.role === "employee") && (
         <div className="bg-slate-900/70 backdrop-blur-xl p-5 sm:p-8 rounded-2xl md:rounded-3xl border border-slate-800/80 hover:border-indigo-500/30 flex flex-col justify-between relative overflow-hidden shadow-2xl w-full max-w-5xl mx-auto">
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500 via-purple-600 to-transparent opacity-60" />
@@ -194,11 +194,11 @@ export default function EbookManager({
         </div>
       )}
 
-      {/* Main Ebook Library Display Module */}
+      {/* Main ebook library display module */}
       <div className="bg-slate-800/30 rounded-2xl md:rounded-[2rem] border border-slate-700 p-4 sm:p-8">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xs font-mono text-slate-500 uppercase tracking-widest">
-            Ebook Library Storage ({filteredEbooks.length})
+            Ebook Library ({filteredEbooks.length})
           </h3>
         </div>
 
@@ -214,7 +214,7 @@ export default function EbookManager({
         {filteredEbooks.length === 0 ? (
           <div className="py-16 text-center border-2 border-slate-800 border-dashed rounded-2xl">
             <p className="text-slate-600 font-mono text-xs tracking-widest uppercase">
-              [ No Ebook Items Located ]
+              No Ebook Items Located
             </p>
           </div>
         ) : (
@@ -225,9 +225,9 @@ export default function EbookManager({
                 className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700 hover:border-indigo-500/50 transition-all group gap-4"
               >
                 <div className="flex items-start gap-3 sm:gap-4 min-w-0 w-full">
-                  <span className="text-xl sm:text-2xl opacity-50 group-hover:opacity-100 shrink-0 select-none">
-                    📚
-                  </span>
+                  {/* <span className="text-xl sm:text-2xl opacity-50 group-hover:opacity-100 shrink-0 select-none">
+                    
+                  </span> */}
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-slate-200 text-sm sm:text-base break-words line-clamp-2 sm:line-clamp-none">
                       {book.book_title || book.filename}
@@ -249,10 +249,9 @@ export default function EbookManager({
                   </div>
                 </div>
 
-                {/* ACTIONS INTERFACE CONTAINER */}
+                {/* Action interface container */}
                 <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-slate-700/50 sm:border-t-0 justify-end">
                   
-                  {/* VIEW BUTTON - Fixed to cleanly send raw book.filename into handleViewEbook */}
                   <button
                     onClick={() => handleViewEbook(book.filename)}
                     className="px-3 sm:px-4 py-2 bg-slate-700 hover:bg-indigo-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center text-slate-200 hover:text-white"
@@ -270,7 +269,6 @@ export default function EbookManager({
                     </button>
                   )}
 
-                  {/* DELETE BUTTON */}
                   {(user.role === "admin" || user.role === "employee") && (
                     <button
                       onClick={() =>

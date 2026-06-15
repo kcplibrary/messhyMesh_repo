@@ -1,6 +1,15 @@
 // import React from "react";
 
-const ConfirmationModal = ({ isOpen, title, message, confirmText = "Confirm", cancelText = "Cancel", onConfirm, onCancel, isDestructive = false }) => {
+const ConfirmationModal = ({
+  isOpen,
+  title,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  onConfirm,
+  onCancel,
+  isDestructive = false,
+}) => {
   if (!isOpen) return null;
 
   // Change theme colors based on whether this action is dangerous/destructive
@@ -8,34 +17,37 @@ const ConfirmationModal = ({ isOpen, title, message, confirmText = "Confirm", ca
     ? {
         border: "border-rose-500/30 shadow-rose-500/10",
         badge: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-        btnConfirm: "bg-rose-600 hover:bg-rose-500 shadow-rose-600/20 focus:ring-rose-500",
+        btnConfirm:
+          "bg-rose-600 hover:bg-rose-500 shadow-rose-600/20 focus:ring-rose-500",
       }
     : {
         border: "border-sky-500/30 shadow-sky-500/10",
         badge: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-        btnConfirm: "bg-sky-600 hover:bg-sky-500 shadow-sky-600/20 focus:ring-sky-500",
+        btnConfirm:
+          "bg-sky-600 hover:bg-sky-500 shadow-sky-600/20 focus:ring-sky-500",
       };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 select-none animate-in fade-in duration-200">
-      
-      {/* 1. Backdrop Blur Overlay Layer */}
-      <div 
+      {/* Backdrop Blur Overlay Layer */}
+      <div
         onClick={onCancel}
-        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity" 
+        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"
       />
 
-      {/* 2. Core Dialog Card Container */}
-      <div className={`relative max-w-md w-full bg-slate-900/90 border ${accentColors.border} p-6 rounded-2xl shadow-2xl flex flex-col gap-4 text-left animate-in zoom-in-95 slide-in-from-bottom-4 duration-300`}>
-        
-        {/* Header Header Row */}
+      {/* Core dialog card container */}
+      <div
+        className={`relative max-w-md w-full bg-slate-900/90 border ${accentColors.border} p-6 rounded-2xl shadow-2xl flex flex-col gap-4 text-left animate-in zoom-in-95 slide-in-from-bottom-4 duration-300`}
+      >
         <div className="flex items-center gap-3">
-          <span className={`text-[10px] font-mono font-black tracking-widest uppercase px-2 py-0.5 rounded border ${accentColors.badge}`}>
+          <span
+            className={`text-[10px] font-mono font-black tracking-widest uppercase px-2 py-0.5 rounded border ${accentColors.badge}`}
+          >
             {isDestructive ? "CRITICAL OVERRIDE" : "SYSTEM VERIFICATION"}
           </span>
         </div>
 
-        {/* Messaging Block */}
+        {/* Messaging block */}
         <div>
           <h3 className="text-sm font-mono font-bold text-slate-100 leading-snug">
             {title}
@@ -45,7 +57,7 @@ const ConfirmationModal = ({ isOpen, title, message, confirmText = "Confirm", ca
           </p>
         </div>
 
-        {/* Actions Button Footprint Bar */}
+        {/* Actions button footprint bar */}
         <div className="flex items-center justify-end gap-3 font-mono text-xs mt-2 pt-2 border-t border-slate-800/60">
           <button
             onClick={onCancel}
@@ -60,7 +72,6 @@ const ConfirmationModal = ({ isOpen, title, message, confirmText = "Confirm", ca
             {confirmText}
           </button>
         </div>
-        
       </div>
     </div>
   );

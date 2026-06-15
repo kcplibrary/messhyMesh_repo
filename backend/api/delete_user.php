@@ -12,8 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 require_once __DIR__ . '/../config/db_connect.php';
 
-// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
-
 // Get the data first
 $data = json_decode(file_get_contents("php://input"), true);
 $id = $data['id'] ?? null;
@@ -37,7 +35,6 @@ try {
 
     $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
     $stmt->execute([':id' => $id]);
-    // echo json_encode(["status" => "success", "message" => "User Node De-provisioned"]);
     echo json_encode(["status" => "success", "message" => "User successfully removed."]);
     } catch (Exception $e) {
         http_response_code(500);

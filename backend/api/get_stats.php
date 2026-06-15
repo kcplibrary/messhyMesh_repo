@@ -41,7 +41,7 @@ try {
     $weeklyUploadsCount = (int)$stmtWeeklyFiles->fetch()['total'];
 
 
-    // --- 4. DYNAMIC SEMESTER SETTINGS WINDOW (Converted from MySQLi to PDO) ---
+    // DYNAMIC SEMESTER SETTINGS WINDOW (Converted from MySQLi to PDO)
     $settings_query = $pdo->query("SELECT setting_key, setting_value FROM semester_settings");
     $settings = [];
     while($row = $settings_query->fetch()) {
@@ -61,7 +61,7 @@ try {
     $semester_uploads = (int)$sem_stmt->fetch()['cnt'];
 
 
-    // --- 5. DYNAMIC HISTORICAL LOOKBACK FILTER PARSING ---
+    // DYNAMIC HISTORICAL LOOKBACK FILTER PARSING
     $timeframe = isset($_GET['timeframe']) ? $_GET['timeframe'] : null;
     $day       = isset($_GET['day']) ? (int)$_GET['day'] : (int)date('d');
     $week      = isset($_GET['week']) ? $_GET['week'] : 'Week 1';

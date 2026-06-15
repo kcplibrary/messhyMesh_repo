@@ -1,11 +1,11 @@
 <?php
-// 1. Grant global access permission to Cloudflare's incoming frontend requests
+// Grant global access permission to Cloudflare's incoming frontend requests
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning");
 header("Content-Type: application/json");
 
-// 2. Intercept and wave through browser safety pre-flight checks instantly
+// Intercept and wave through browser safety pre-flight checks instantly
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -16,7 +16,7 @@ require_once __DIR__ . '/../config/db_connect.php';
 try {
     global $pdo;
     
-    // 3. Structured LEFT JOIN query to fetch metadata alongside the sector names
+    // Structured LEFT JOIN query to fetch metadata alongside the sector names
     // Aligned to match your get_files template pattern (eb.* and community_name)
     $sql = "SELECT 
                 eb.*, 
@@ -28,7 +28,7 @@ try {
     $stmt = $pdo->query($sql);
     $ebooks = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // 4. Data Normalization: Ensure IDs are true integers so React doesn't trip on type mismatches
+    // Data Normalization: Ensure IDs are true integers so React doesn't trip on type mismatches
     foreach ($ebooks as &$book) {
         $book['id'] = (int)$book['id'];
         if ($book['community_id'] !== null) {

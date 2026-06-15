@@ -15,13 +15,11 @@ const CommunityManager = ({
   setConfirmModal,
 }) => {
   return (
-    // Adjusted padding: p-4 on phones, p-8 on medium/desktop screens (md:p-8)
     <div className="mb-12 bg-slate-800/50 p-4 sm:p-6 md:p-8 rounded-[2rem] border border-emerald-500/30 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-500">
       <h2 className="text-lg sm:text-xl font-black mb-6 sm:mb-8 text-white uppercase">
         Create Community
       </h2>
 
-      {/* FORM: Shifts from a stacked layout on mobile to a clean row on small screens (sm:flex-row) */}
       <form
         onSubmit={handleCreateCommunity}
         className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8"
@@ -38,7 +36,7 @@ const CommunityManager = ({
         </button>
       </form>
 
-      {/* EXISTING SECTORS PANEL */}
+      {/* Existing sectors panel */}
       <div className="space-y-2 border-t border-slate-700 pt-6">
         <h3 className="text-[10px] font-mono text-slate-500 uppercase mb-4 tracking-widest">
           Existing Communities
@@ -52,7 +50,7 @@ const CommunityManager = ({
                 // Row Card: Stacks items into columns on mobile, restores row tracking on tablets/desktop
                 className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-700 hover:border-emerald-500/30 transition-all group gap-3 sm:gap-2"
               >
-                {/* LEFT SIDE: Name Display / Edit Field */}
+                {/* Left side: name display / edit field */}
                 <div className="flex items-center gap-3 w-full sm:flex-1 min-w-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                   {editingId === c.id ? (
@@ -71,7 +69,7 @@ const CommunityManager = ({
                   )}
                 </div>
 
-                {/* RIGHT SIDE: Interactive Actions Controls */}
+                {/* Right side: interactive actions controls */}
                 <div className="flex items-center gap-3 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t border-slate-800/60 sm:border-t-0">
                   {editingId === c.id ? (
                     <div className="flex gap-4">
@@ -110,8 +108,8 @@ const CommunityManager = ({
                           onClick={() =>
                             setConfirmModal({
                               isOpen: true,
-                              targetId: c.id, // 👈 Tied to 'c.id' inside your .map() loop
-                              type: "community", // 👈 Tells your central dashboard to fire handleDeleteCommunity
+                              targetId: c.id,
+                              type: "community",
                             })
                           }
                           className="text-slate-500 hover:text-red-500 hover:bg-slate-800 p-2 rounded-lg transition-all"

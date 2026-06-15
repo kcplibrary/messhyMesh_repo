@@ -1,17 +1,15 @@
 <?php
-// 1. Grant global access permission to Cloudflare's incoming frontend requests
+// Grant global access permission to Cloudflare's incoming frontend requests
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning");
 header("Content-Type: application/json");
 
-// 2. Intercept and wave through browser safety pre-flight checks instantly
+// Intercept and wave through browser safety pre-flight checks instantly
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-
-// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
 
 require_once __DIR__ . '/../config/db_connect.php';
 
@@ -34,7 +32,7 @@ if (empty($community_id) || $community_id === "null") {
     exit;
 }
 
-// Absolute path
+// Absolute path, you can change directory in case the project's gonna be moved to another computer
 $targetDir = "/home/kcplibrary/Documents/messyMesh/backend/uploads/";
 
 // Clear cache to ensure PHP sees the latest permissions
@@ -78,6 +76,7 @@ if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
         }
 } else {
     http_response_code(500);
+    
     // Check if the temporary file actually exists
     $tmpExists = file_exists($_FILES["file"]["tmp_name"]) ? "Yes" : "No";
     echo json_encode([

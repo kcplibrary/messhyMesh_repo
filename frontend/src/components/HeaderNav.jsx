@@ -31,10 +31,10 @@ const HeaderNav = ({
   }, []);
 
   const navItems = [
-    { id: "home", label: "Home", },
+    { id: "home", label: "Home" },
     { id: "collections", label: "Collections", role: "employee" },
-    { id: "ebooks", label: "Ebooks"},
-    { id: "communities", label: "Communities",  role: "admin" },
+    { id: "ebooks", label: "Ebooks" },
+    { id: "communities", label: "Communities", role: "admin" },
     { id: "patrons", label: "Patrons", role: "admin" },
     // { id: "about", label: "About" },
   ];
@@ -49,7 +49,7 @@ const HeaderNav = ({
   return (
     <header className="w-full bg-slate-900/60 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-50 transition-all mb-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* LEFT COMPONENT: BRAND ANCHOR */}
+        {/* Left component: brand anchor */}
         <div
           onClick={() => {
             setActiveSection("home");
@@ -86,7 +86,7 @@ const HeaderNav = ({
           </div>
         </div>
 
-        {/* CENTER COMPONENT: REFINED GLOWING ROUNDED CAPSULE NAVIGATION */}
+        {/* Center component */}
         <nav className="hidden md:flex items-center gap-1.5 bg-slate-950/20 border border-slate-800/30 px-2 py-1.5 rounded-2xl">
           {navItems.filter(shouldRenderItem).map((item) => {
             const isActive = activeSection === item.id;
@@ -103,7 +103,7 @@ const HeaderNav = ({
                 <span className="text-xs opacity-80">{item.icon}</span>
                 {item.label}
 
-                {/* Subtle decorative dot metric indicating active tab status */}
+                {/* Subtle dot metric indicating active tab status */}
                 {isActive && (
                   <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-400 rounded-full shadow-lg shadow-blue-400" />
                 )}
@@ -112,29 +112,19 @@ const HeaderNav = ({
           })}
         </nav>
 
-        {/* RIGHT COMPONENT: USER PROFILE HUB & MOBILE TOGGLE */}
+        {/* Right component: user profile hub & mobile toggle */}
         <div className="flex items-center gap-4">
-          {/* PROFILE HUBS BUTTON CONTAINER */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               className="flex items-center gap-3 text-left group bg-slate-800/30 hover:bg-slate-800/60 border border-slate-700/40 px-3 py-1.5 rounded-xl transition-all select-none"
             >
-              {/* <div className="text-right hidden sm:block">
-                <div className="text-[11px] font-mono font-bold text-slate-300 group-hover:text-white transition-colors leading-none">
-                  {adminUsername || "OPERATOR"}
-                </div>
-                <div className="text-[9px] font-mono text-emerald-400 uppercase tracking-widest mt-1 leading-none font-bold">
-                  {userRole}
-                </div>
-              </div> */}
-
               <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 group-hover:border-blue-400/40 flex items-center justify-center font-mono font-bold text-blue-400 uppercase text-[11px] transition-all">
                 {(adminUsername || "U").charAt(0)}
               </div>
             </button>
 
-            {/* PROFILE OPTIONS DROPDOWN */}
+            {/* Profile options dropdown */}
             {profileDropdownOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-slate-900 border border-slate-700/60 rounded-xl shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-top-1.5 duration-150 backdrop-blur-xl">
                 <div className="px-3 py-2 border-b border-slate-800/80 mb-1">
@@ -146,6 +136,7 @@ const HeaderNav = ({
                   </p>
                 </div>
 
+                {/* Edit profile */}
                 {/* <button
                   onClick={() => {
                     setActiveSection("edit-profile");
@@ -157,7 +148,7 @@ const HeaderNav = ({
                       : "text-slate-400 hover:bg-slate-800"
                   }`}
                 >
-                  👤 Edit Profile
+                  Edit Profile
                 </button> */}
 
                 {userRole === "admin" && (
@@ -172,7 +163,7 @@ const HeaderNav = ({
                         : "text-slate-400 hover:bg-slate-800"
                     }`}
                   >
-                    ⚙️ Semester Configuration
+                    Semester Configuration
                   </button>
                 )}
 
@@ -183,13 +174,13 @@ const HeaderNav = ({
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[10px] font-mono font-bold uppercase tracking-wider text-rose-400 hover:bg-rose-500/10 transition-all border-t border-slate-800 mt-1 pt-2"
                 >
-                  🚪 Logout
+                  Logout
                 </button>
               </div>
             )}
           </div>
 
-          {/* MOBILE TOGGLE BURGER BUTTON (Visible on Mobile/Tablet Only) */}
+          {/* Mobile toggle burger button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-xl bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 text-slate-300 transition-colors"
@@ -220,7 +211,7 @@ const HeaderNav = ({
         </div>
       </div>
 
-      {/* MOBILE MENU SLIDEOUT SIDE DRAWER OVERLAY */}
+      {/* Mobile menu slideout side drawer overlay */}
       {mobileMenuOpen && (
         <div
           className="md:hidden fixed inset-0 top-16 bg-slate-950/80 backdrop-blur-sm z-40 transition-all"

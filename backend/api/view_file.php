@@ -1,5 +1,5 @@
 <?php
-// 1. Force global CORS clearances so the browser doesn't trip out
+// Force global CORS clearances so the browser doesn't trip out
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, ngrok-skip-browser-warning");
@@ -9,17 +9,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
-// 2. Exact absolute path to your folder
+// Exact absolute path to your folder
 $uploadDirectory = '/home/kcplibrary/Documents/messyMesh/backend/uploads/';
 
-// 3. Get file parameter and explicitly DECODE it to handle long names with dashes/numbers
+// Get file parameter and explicitly DECODE it to handle long names with dashes/numbers
 $filename = $_GET['file'] ?? '';
 $filename = rawurldecode($filename); // Cleans up %20, dashes, and URL mutations
 $filename = basename($filename); 
 
 $filePath = $uploadDirectory . $filename;
 
-// 4. Enhanced Path Debugger: Let's find out EXACTLY what went wrong
+// Enhanced Path Debugger: Let's find out EXACTLY what went wrong
 if (!$filename || !file_exists($filePath)) {
     header("HTTP/1.1 404 Not Found");
     header('Content-Type: application/json');
@@ -36,7 +36,7 @@ if (!$filename || !file_exists($filePath)) {
     ]));
 }
 
-// 5. If it gets past the check, stream it!
+// If it gets past the check, stream it!
 $fileMimeType = mime_content_type($filePath);
 header("Content-Type: " . $fileMimeType);
 header("Content-Length: " . filesize($filePath));

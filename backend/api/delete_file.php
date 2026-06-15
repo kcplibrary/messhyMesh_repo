@@ -1,25 +1,23 @@
 <?php
-// 1. Grant global access permission to Cloudflare's incoming frontend requests
+// Grant global access permission to Cloudflare's incoming frontend requests
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning");
 header("Content-Type: application/json");
 
-// 2. Intercept and wave through browser safety pre-flight checks instantly
+// Intercept and wave through browser safety pre-flight checks instantly
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 require_once __DIR__ . '/../config/db_connect.php';
 
-// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
-
 $data = json_decode(file_get_contents("php://input"), true);
 $fileId = $data['id'] ?? null;
 
 if ($fileId) {
     try {
-        // 1. Get the filename first so we can delete it from the folder
+        // Get the filename first so we can delete it from the folder
         $stmt = $pdo->prepare("SELECT filename FROM files WHERE id = :id");
         $stmt->execute([':id' => $fileId]);
         $file = $stmt->fetch();
@@ -27,12 +25,12 @@ if ($fileId) {
         if ($file) {
             $filePath = __DIR__ . '/../uploads/' . $file['filename'];
             
-            // 2. Delete the physical file
+            // Delete the physical file
             if (file_exists($filePath)) {
                 unlink($filePath);
             }
 
-            // 3. Delete the database record
+            // Delete the database record
             $delStmt = $pdo->prepare("DELETE FROM files WHERE id = :id");
             $delStmt->execute([':id' => $fileId]);
 

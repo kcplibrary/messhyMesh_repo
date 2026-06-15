@@ -64,7 +64,7 @@ function App() {
     setUser(null);
     setUsername("");
     setPassword("");
-    setMessage("You have been logged out.");
+    setMessage("Logged out.");
   };
 
   if (user) {
@@ -77,10 +77,7 @@ function App() {
   }
 
   return (
-    /* 1. Added 'relative overflow-hidden' to prevent 3D canvas viewport overflow */
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100 relative overflow-hidden">
-      
-      {/* 2. ABSOLUTE SPLINE BACKGROUND CONTAINER LAYER */}
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-auto">
         <Spline scene="https://prod.spline.design/8z1DQ8eWmkaOnZ4z/scene.splinecode" />
         
@@ -90,7 +87,7 @@ function App() {
         <div className="absolute bottom-0 right-0 w-72 h-32 bg-gradient-to-br from-transparent via-slate-950/100 to-slate-950 pointer-events-none filter blur-sm" />
         </div>
 
-      {/* 3. FOREGROUND GLASSMORPHIC LOGIN CARD (Raised above 3D scene using relative z-10) */}
+      {/* FOREGROUND GLASSMORPHIC LOGIN CARD (Raised above 3D scene using relative z-10) */}
       <div className="w-full max-w-md bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl shadow-2xl p-10 relative z-10">
         <h1 className="text-5xl font-black text-center mb-2 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
           KCPLIBRARY

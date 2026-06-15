@@ -1,19 +1,17 @@
 <?php
-// 1. Grant global access permission to Cloudflare's incoming frontend requests
+// Grant global access permission to Cloudflare's incoming frontend requests
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning");
 header("Content-Type: application/json");
 
-// 2. Intercept and wave through browser safety pre-flight checks instantly
+// Intercept and wave through browser safety pre-flight checks instantly
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
 require_once __DIR__ . '/../config/db_connect.php';
-
-// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
 
 $data = json_decode(file_get_contents("php://input"), true);
 $id = $data['id'] ?? null;
@@ -31,14 +29,12 @@ try {
     $stmt = $pdo->prepare("UPDATE communities SET name = :name WHERE id = :id");
     $stmt->execute([':name' => trim($newName), ':id' => $id]);
     
-    // Modernized phrasing that flows cleanly into your green ToastNotification component
     echo json_encode(["status" => "success", "message" => "Community successfully reconfigured to '" . trim($newName) . "'."]);
 
 } catch (Exception $e) {
-    // Force Axios into its catch(err) block
     http_response_code(500);
     
-    // SECURITY FIX: Hide raw SQL structural syntax errors from showing up inside your premium UI layout layers
+    // Hide raw SQL structural syntax errors from showing up inside your premium UI layout layers
     echo json_encode(["status" => "error", "message" => "Modification exception: Core database engine refused to update sector entry metadata safely."]);
 }
 ?>

@@ -5,7 +5,7 @@
 export const generateAPA7 = (file) => {
   if (!file) return "";
 
-  // 1. Handle Author (e.g., "ROSE ANN P. BINWIHAN" -> "Binwihan, R. A. P.")
+  // Handle Author (e.g., "ROSE ANN P. BINWIHAN" -> "Binwihan, R. A. P.")
   let authorRaw = file.paper_author || file.uploaded_by || "Unknown Author";
   let formattedAuthor = authorRaw;
 
@@ -34,10 +34,10 @@ export const generateAPA7 = (file) => {
     }
   }
 
-  // 2. Handle Year
+  // Handle Year
   const year = file.paper_year || "n.d."; 
 
-  // 3. Handle Title (Sentence Case + Protect Proper Nouns)
+  // Handle Title (Sentence Case + Protect Proper Nouns)
   let rawTitle = file.paper_title;
   if (!rawTitle && file.filename) {
     rawTitle = file.filename.replace(/\.[^/.]+$/, "").split('_').pop().replace(/-/g, ' ');
@@ -55,8 +55,8 @@ export const generateAPA7 = (file) => {
     displayTitle = displayTitle.replace(regex, noun);
   });
 
-  // 4. URL (Strict APA 7: No "Retrieved from", no trailing period)
-  const backendUrl = "http://localhost:8000";
+  // URL (Strict APA 7: No "Retrieved from", no trailing period)
+  const backendUrl = "https://repo.kcplibrary.com/";
   const citation = `${formattedAuthor.trim()} (${year}). ${displayTitle}. ${backendUrl}/uploads/${file.filename}`;
   
   if (navigator.clipboard) {

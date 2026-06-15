@@ -1,9 +1,16 @@
 // import React from "react";
 
-const SearchFilters = ({ searchTerm, setSearchTerm, selectedSector, setSelectedSector, communities, type }) => {
+const SearchFilters = ({
+  searchTerm,
+  setSearchTerm,
+  selectedSector,
+  setSelectedSector,
+  communities,
+  type,
+}) => {
   return (
     <div className="flex flex-col md:flex-row gap-4 mb-6 bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
-      {/* TEXT SEARCH */}
+      {/* Text search */}
       <div className="flex-1">
         <input
           type="text"
@@ -14,7 +21,7 @@ const SearchFilters = ({ searchTerm, setSearchTerm, selectedSector, setSelectedS
         />
       </div>
 
-      {/* SECTOR FILTER */}
+      {/* Sector filter */}
       <div className="w-full md:w-64">
         <select
           className="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded-xl text-xs font-bold outline-none focus:ring-2 ring-blue-500 transition-all cursor-pointer appearance-none"

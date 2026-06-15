@@ -1,23 +1,23 @@
 <?php
-// 1. Grant global access permission to Cloudflare's incoming frontend requests
+// Grant global access permission to Cloudflare's incoming frontend requests
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning");
 header("Content-Type: application/json");
 
-// 2. Intercept and wave through browser safety pre-flight checks instantly
+// Intercept and wave through browser safety pre-flight checks instantly
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// 1. Include the 'Handshake' file we just made
+// Include the 'Handshake' file we just made
 require_once __DIR__ . '/../config/db_connect.php';
 
-// 2. Tell the browser we are sending back JSON (standard for modern apps)
+// Tell the browser we are sending back JSON (standard for modern apps)
 header('Content-Type: application/json');
 
-// 3. Get the data from the login form
+// Get the data from the login form
 $user = $_POST['username'] ?? '';
 $pass = $_POST['password'] ?? '';
 
@@ -26,16 +26,16 @@ if (!$user || !$pass) {
     exit;
 }
 
-// 4. Check the database for the user
+// Check the database for the user
 try {
     $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
     $stmt->execute([$user]);
     $account = $stmt->fetch();
 
-    // 6. Verify the password and role
+    // Verify the password and role
     if ($account && $pass === $account['password_hash']) {
 
-        //RECORD TODAY'S ACTIVE LOGIN ENTRY
+        //Record today's login activity
         $trackStmt = $pdo->prepare("INSERT INTO user_logins (user_id, username, role) VALUES (?, ?, ?)");
         $trackStmt->execute([
             $account['id'], 
@@ -43,7 +43,7 @@ try {
             $account['role']
             ]);
 
-        //SELF-CLEAN HISTORICAL SCRATCHPAD
+        // Auto self-clean historical scratchpad, yearly
         $pdo->query("DELETE FROM user_logins WHERE login_time < NOW() - INTERVAL 365 DAY");
         
         echo json_encode([

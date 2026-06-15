@@ -1,24 +1,24 @@
 <?php
-// 1. Grant global access permission to Cloudflare's incoming frontend requests
+// Grant global access permission to Cloudflare's incoming frontend requests
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning");
 header("Content-Type: application/json");
 
-// 2. Intercept and wave through browser safety pre-flight checks instantly
+// Intercept and wave through browser safety pre-flight checks instantly
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 require_once __DIR__ . '/../config/db_connect.php';
 
-// 3. Intercept payload parameters packed inside the axios.post application/json body
+// Intercept payload parameters packed inside the axios.post application/json body
 $data = json_decode(file_get_contents("php://input"), true);
 $fileId = $data['id'] ?? null;
 
 if ($fileId) {
     try {
-        // 1. Fetch the book file's text descriptor from your ebooks table index rows
+        // Fetch the book file's text descriptor from your ebooks table index rows
         $stmt = $pdo->prepare("SELECT filename FROM ebooks WHERE id = :id");
         $stmt->execute([':id' => $fileId]);
         $file = $stmt->fetch();
@@ -27,12 +27,12 @@ if ($fileId) {
             // Absolute path targeting your isolated textbooks storage sub-folder partition
             $filePath = '/home/kcplibrary/Documents/messyMesh/backend/uploads/ebooks/' . $file['filename'];
             
-            // 2. Clear out the physical binary document asset from server storage space
+            // Clear out the physical binary document asset from server storage space
             if (file_exists($filePath)) {
                 unlink($filePath);
             }
 
-            // 3. Purge the matching row registration from the database tracking cluster
+            // Purge the matching row registration from the database tracking cluster
             $delStmt = $pdo->prepare("DELETE FROM ebooks WHERE id = :id");
             $delStmt->execute([':id' => $fileId]);
 

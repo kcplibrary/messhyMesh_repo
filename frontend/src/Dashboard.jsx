@@ -22,13 +22,9 @@ const API_BASE = "https://customer-yahoo-outing.ngrok-free.dev/backend/api";
 function Dashboard({ user, logout }) {
   const [currentView, setCurrentView] = useState("papers");
   const [activeSection, setActiveSection] = useState("home");
-
-  // --- ALL YOUR ORIGINAL STATES (UNTOUCHED) ---
   const [files, setFiles] = useState([]);
   const [usersList, setUsersList] = useState([]);
   const [communities, setCommunities] = useState([]);
-  // const [showAddUser, setShowAddUser] = useState(false);
-  // const [showAddComm, setShowAddComm] = useState(false);
   const [selectedTargetComm, setSelectedTargetComm] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -68,7 +64,6 @@ function Dashboard({ user, logout }) {
   const [ebooksList, setEbooksList] = useState([]);
 
   // Stats check
-  // const [stats, setStats] = useState({ nodes: 0, archives: 0, sectors: 0 });
   const [stats, setStats] = useState({
     nodes: 0,
     archives: 0,
@@ -84,7 +79,7 @@ function Dashboard({ user, logout }) {
     semesterUploads: 0,
   });
 
-  // --- CALENDAR MODULATION TRIGGER ENGINE ---
+  // Calender modulation trigger engine
   const handleUpdateSemester = async (e) => {
     e.preventDefault();
     if (!semLabel || !semStart || !semEnd) {
@@ -105,7 +100,7 @@ function Dashboard({ user, logout }) {
       });
       const data = await response.json();
       if (data.status === "success") {
-        fetchStats(); // Instantly refresh system wide storage numbers
+        fetchStats();
         alert("System terms updated successfully!");
         setShowSettings(false);
       } else {
@@ -150,20 +145,8 @@ function Dashboard({ user, logout }) {
 
     return matchesSearch && matchesSector;
   });
-  // // Filter Files
-  // const filteredFiles = files.filter((f) => {
-  //   const matchesSearch = f.filename
-  //     .toLowerCase()
-  //     .includes(fileSearch.toLowerCase());
 
-  //   const matchesSector =
-  //     fileSectorFilter === "" ||
-  //     String(f.community_id) === String(fileSectorFilter);
-
-  //   return matchesSearch && matchesSector;
-  // });
-
-  // tunnel
+  // tunnel setup, don't delete
   const ngrokConfig = {
     headers: {
       "Content-Type": "application/json",
@@ -238,7 +221,6 @@ function Dashboard({ user, logout }) {
       }
 
       const res = await axios.get(`${API_BASE}/get_stats.php`, config);
-
       if (res.data.status === "success") {
         setStats(res.data.stats); // This updates the state
 
@@ -258,26 +240,6 @@ function Dashboard({ user, logout }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // const fetchStats = useCallback(async () => {
-  //   try {
-  //     const res = await axios.get(`${API_BASE}/get_stats.php`, ngrokConfig);
-  //     if (res.data.status === "success") {
-  //       setStats(res.data.stats); // This updates the state
-
-  //       // Auto-seed text inputs with the active values from database
-  //       if (res.data.stats.semesterLabel) {
-  //         setSemLabel(res.data.stats.semesterLabel);
-  //       }
-  //       // If your stats backend endpoint maps values for active dates:
-  //       if (res.data.stats.semesterStart)
-  //         setSemStart(res.data.stats.semesterStart);
-  //       if (res.data.stats.semesterEnd) setSemEnd(res.data.stats.semesterEnd);
-  //     }
-  //   } catch (err) {
-  //     console.error("Stats Fetch Error:", err);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
 
   useEffect(() => {
     fetchFiles();
@@ -298,7 +260,6 @@ function Dashboard({ user, logout }) {
 
     try {
       const res = await axios.post(`${API_BASE}/update_user.php`, {
-        // id,
         id: id,
         username: editUsername,
         role: editRole,
@@ -355,13 +316,6 @@ function Dashboard({ user, logout }) {
   };
 
   const handleDeleteUser = async (id) => {
-    // if (
-    //   !window.confirm(
-    //     "TERMINATE ACCOUNT: This will revoke all access for this repository. Continue?",
-    //   )
-    // )
-    //   return;
-
     if (!id) return;
 
     try {
@@ -433,7 +387,6 @@ function Dashboard({ user, logout }) {
       }
     } catch (err) {
       console.error(err);
-      // alert("Rename failed.");
       setToast({
         message:
           err.response?.data?.message ||
@@ -444,11 +397,6 @@ function Dashboard({ user, logout }) {
   };
 
   const handleDeleteCommunity = async (id) => {
-    // if (
-    //   !window.confirm("Are you sure you want to terminate this community node?")
-    // )
-    //   return;
-
     if (!id) return;
 
     try {
@@ -475,7 +423,6 @@ function Dashboard({ user, logout }) {
           type: "error",
         });
       }
-      // else alert(response.data.message);
     } catch (err) {
       console.error(err);
       setToast({
@@ -484,14 +431,12 @@ function Dashboard({ user, logout }) {
           "Termination failed: Severe handshake exception with core server database.",
         type: "error",
       });
-      // alert("System Error: Could not delete community.");
     }
   };
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file || !selectedTargetComm) {
-      // setStatusMsg("SYSTEM_REJECTION: Select a Target Sector first.");
       setToast({
         message:
           "SYSTEM_REJECTION: Select a Target Sector and load a file descriptor asset first.",
@@ -510,16 +455,13 @@ function Dashboard({ user, logout }) {
 
     try {
       setIsUploading(true);
-      // setStatusMsg("Routing to Sector Collection...");
 
       const res = await axios.post(`${API_BASE}/upload.php`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (res.data.status === "success") {
-        // setStatusMsg(res.data.message);
         fetchFiles();
-
         setPaperTitle("");
         setPaperAuthor("");
         setPaperYear("");
@@ -541,13 +483,10 @@ function Dashboard({ user, logout }) {
         });
       }
 
-      // setStatusMsg("File uploaded and indexed successfully!");
       fetchFiles();
       fetchStats();
-      // } else setStatusMsg("System Error: " + res.data.message);
     } catch (err) {
       console.error(err);
-      // setStatusMsg("Archive Failed: Network/Server Error");
       setToast({
         message:
           err.response?.data?.message ||
@@ -555,14 +494,17 @@ function Dashboard({ user, logout }) {
         type: "error",
       });
     } finally {
-      // 6. UNLOCK BUTTON: Turn off loading state regardless of whether it succeeded or crashed
+      // UNLOCK BUTTON: Turn off loading state regardless of whether it succeeded or crashed
       setIsUploading(false);
     }
   };
 
   const handleViewFile = (filename) => {
     if (!filename) {
-      setToast({ message: "VIEW_ERROR: Collections identifier missing.", type: "error" });
+      setToast({
+        message: "VIEW_ERROR: Collections identifier missing.",
+        type: "error",
+      });
       return;
     }
 
@@ -571,38 +513,24 @@ function Dashboard({ user, logout }) {
     window.open(fileUrl, "_blank");
   };
 
-// 📚 Dedicated Document Engine for Ebooks & Textbooks
+  // Dedicated Document Engine for Ebooks & Textbooks
   const handleViewEbook = (filename) => {
     if (!filename) {
-      setToast({ message: "VIEW_ERROR: Ebook identifier missing.", type: "error" });
+      setToast({
+        message: "VIEW_ERROR: Ebook identifier missing.",
+        type: "error",
+      });
       return;
     }
-    // Connects directly to your view_ebooks.php backend script file!
+    // Connects directly to your view_ebooks.php backend script file.
     const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/view_ebooks.php?file=${encodeURIComponent(filename)}&ngrok-skip-browser-warning=true`;
     window.open(fileUrl, "_blank");
   };
 
-  // const handleCreateCommunity = async (e) => {
-  //   e.preventDefault();
-  //   if (!newCommName.trim()) return;
-  //   try {
-  //     const res = await axios.post(`${API_BASE}/create_community.php`, {
-  //       name: newCommName,
-  //     });
-  //     setStatusMsg(res.data.message);
-  //     setNewCommName("");
-  //     fetchCommunities();
-  //   } catch (err) {
-  //     setStatusMsg(
-  //       "System Error: " + (err.response?.data?.message || "Check connection"),
-  //     );
-  //   }
-  // };
-
   const handleCreateCommunity = async (e) => {
     e.preventDefault();
 
-    // 1. FRONTEND DATA GATING VALIDATION
+    // Frontend data gating validation
     if (!newCommName.trim()) {
       setToast({
         message:
@@ -617,7 +545,7 @@ function Dashboard({ user, logout }) {
         name: newCommName.trim(),
       });
 
-      // 2. SUCCESS HANDLING (Green Toast + Sync Re-Fetch)
+      // Success handling
       if (res.data.status === "success") {
         setNewCommName(""); // Reset text field cache immediately
 
@@ -632,7 +560,7 @@ function Dashboard({ user, logout }) {
         if (typeof fetchCommunities === "function") await fetchCommunities();
         if (typeof fetchStats === "function") await fetchStats();
 
-        // 3. BACKEND REJECTION (Red Toast - e.g., Community name already duplicate)
+        // Backend rejection
       } else {
         setToast({
           message:
@@ -642,7 +570,7 @@ function Dashboard({ user, logout }) {
         });
       }
 
-      // 4. HARDWARE/NETWORK BREAKAGE HANDLERS (Red Toast)
+      // Hardware/network breakage handlers
     } catch (err) {
       console.error(err);
       setToast({
@@ -676,11 +604,11 @@ function Dashboard({ user, logout }) {
       const res = await axios.post(`${API_BASE}/register.php`, params);
       if (res.data.status === "connection success") {
         fetchUsers(); // Refresh the list
+
         // Clear inputs
         setNewUsername("");
         setNewPassword("");
         setSelectedUserDept("");
-        // setStatusMsg(res.data.message);
 
         setToast({
           message:
@@ -697,7 +625,6 @@ function Dashboard({ user, logout }) {
       }
     } catch (err) {
       console.error(err);
-      // setStatusMsg("Registration failed.");
 
       setToast({
         message:
@@ -709,18 +636,11 @@ function Dashboard({ user, logout }) {
 
   const handleDeleteFile = async (id) => {
     if (!id) return;
-    // if (
-    //   !window.confirm(
-    //     "PURGE ARCHIVE: Are you sure you want to permanently delete this file?",
-    //   )
-    // )
-    //   return;
 
     try {
       const res = await axios.post(`${API_BASE}/delete_file.php`, { id });
       if (res.data.status === "success") {
         setFiles(files.filter((f) => f.id !== id));
-        // setStatusMsg("File successfully purged from vault.");
 
         setToast({
           message:
@@ -742,7 +662,7 @@ function Dashboard({ user, logout }) {
       }
     } catch (err) {
       console.error(err);
-      // setStatusMsg("Purge Failed: System error.");
+
       setToast({
         message:
           err.response?.data?.message ||
@@ -754,9 +674,8 @@ function Dashboard({ user, logout }) {
 
   const handleDownload = async (filename) => {
     try {
-      // setStatusMsg("Preparing download...");
 
-      // Fixed the syntax error (removed leading backslash and trailing backtick)
+      // Fixed the syntax error, removed leading backslash and trailing backtick
       // const fileUrl = `http://localhost:8000/api/download.php?file=${filename}`;
       const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/download.php?file=${filename}`;
 
@@ -771,14 +690,14 @@ function Dashboard({ user, logout }) {
 
       // Cleanup
       document.body.removeChild(link);
-      // setStatusMsg("Download initiated.");
+
       setToast({
         message: `Download initiated successfully for '${filename}'.`,
         type: "success",
       });
     } catch (err) {
       console.error("Download error:", err);
-      // setStatusMsg("Download failed: Connection error.");
+
       setToast({
         message:
           "Download failed: High-latency handshake rejection with data asset repository.",
@@ -846,18 +765,6 @@ function Dashboard({ user, logout }) {
           }
           setConfirmModal({ isOpen: false, targetId: null, type: null });
         }}
-        // onConfirm={async () => {
-        //   // 🧠 The Dynamic Traffic Router Loop:
-        //   if (confirmModal.type === "community") {
-        //     await handleDeleteCommunity(confirmModal.targetId);
-        //   } else if (confirmModal.type === "file") {
-        //     await handleDeleteFile(confirmModal.targetId); // 👈 Executes our upgraded file loop!
-        //   } else {
-        //     await handleDeleteUser(confirmModal.targetId);
-        //   }
-
-        //   setConfirmModal({ isOpen: false, targetId: null, type: null });
-        // }}
       />
 
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
@@ -953,18 +860,15 @@ function Dashboard({ user, logout }) {
           </div>
         )}
 
-        {/* =========================================================================
-            HOME TAB VIEW (Default overview area)
-           ========================================================================= */}
+        {/* Home tab view */}
         {activeSection === "home" && (
           <div className="space-y-8 animate-in fade-in duration-200">
             {/* Statistics: Shows only to Admins and employees */}
             {user && (user.role === "admin" || user.role === "employee") && (
-              // <StatsBar stats={stats} />
               <StatsBar stats={stats} onFilterChange={fetchStats} />
             )}
 
-            {/* METRIC PROGRESSIVE TIMELINE MONITORING BAR */}
+            {/* Metrics timeline monitoring */}
             {user && (user.role === "admin" || user.role === "employee") && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 <div className="md:col-span-3 bg-slate-800/40 border border-slate-700/60 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
@@ -990,7 +894,7 @@ function Dashboard({ user, logout }) {
                     </p>
                   </div>
 
-                  {/* Visual Progress Bar */}
+                  {/* Progress Bar */}
                   <div className="w-full md:w-1/3 flex flex-col gap-2">
                     <div className="flex justify-between text-[10px] font-mono uppercase tracking-wider text-slate-500">
                       <span>Indexing Yield Capacity</span>
@@ -1049,17 +953,15 @@ function Dashboard({ user, logout }) {
           </div>
         )}
 
-        {/* Manage Cards - Accessible layout space row */}
+        {/* Manage Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 items-start">
           {/* Manage Collections Form Card */}
           {activeSection === "collections" &&
             (user.role === "admin" || user.role === "employee") && (
               <div className="bg-slate-900/70 backdrop-blur-xl p-8 rounded-3xl shadow-2xl shadow-black/50 border border-slate-800/80 hover:border-blue-500/30 flex flex-col justify-between relative overflow-hidden transition-all duration-500 md:col-span-2 w-full max-w-5xl mx-auto animate-in fade-in slide-in-from-top-1.5 duration-200">
-                {/* Tech Ambiance Glows */}
                 <div className="absolute top-0 left-0 w-80 h-80 bg-blue-500/5 rounded-full filter blur-[100px] pointer-events-none mix-blend-screen" />
                 <div className="absolute bottom-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full filter blur-[80px] pointer-events-none mix-blend-screen" />
 
-                {/* Visual Neon Accent Bar */}
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 via-blue-600 to-transparent opacity-60" />
                 <div className="flex flex-col gap-1.5 w-full">
                   <div className="flex justify-between items-center w-full"></div>
@@ -1072,7 +974,7 @@ function Dashboard({ user, logout }) {
                   </p>
                 </div>
 
-                {/* METADATA INPUT ENGINE */}
+                {/* Metadata input form */}
                 <div className="flex flex-col gap-2 mt-4">
                   <input
                     type="text"
@@ -1103,7 +1005,7 @@ function Dashboard({ user, logout }) {
                   />
                 </div>
 
-                {/* SECTOR SELECTOR */}
+                {/* Section selector*/}
                 <div className="mt-3 relative">
                   <select
                     value={selectedTargetComm}
@@ -1119,7 +1021,7 @@ function Dashboard({ user, logout }) {
                   </select>
                 </div>
 
-                {/* SUBMIT BUTTON TRIGGER */}
+                {/* Submit button */}
                 <label
                   className={`mt-4 group p-4 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-widest border active:scale-[0.98] w-full max-w-xs mx-auto ${
                     isUploading
@@ -1129,7 +1031,7 @@ function Dashboard({ user, logout }) {
                         : "bg-blue-800/40 text-blue-400/60 border-blue-700/40 cursor-not-allowed opacity-50" // 👈 Idle Guard Appearance
                   }`}
                 >
-                  {/* DYNAMIC TEXT LOGIC TRAFFIC HANDLER */}
+                  {/* Traffic handler logic */}
                   {isUploading
                     ? "Routing to Sector Archive..."
                     : selectedTargetComm
@@ -1146,67 +1048,7 @@ function Dashboard({ user, logout }) {
               </div>
             )}
 
-          {/* Manage Community Button Card */}
-          {/* {activeSection === "communities" &&
-            (user.role === "admin" || user.role === "employee") && (
-              <div
-                className="w-full max-w-7xl -mt-30 mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-in fade-in duration-300"
-                CommunityManager
-              />
-            )} */}
-
-          {/* Manage Patrons Button Card */}
-          {/* {activeSection === "patrons" && user.role === "admin" && (
-            <button
-              onClick={() => setShowAddUser(!showAddUser)}
-              className={`p-8 rounded-3xl border text-left flex flex-col justify-between items-start group transition-all duration-300 relative overflow-hidden active:scale-[0.98] md:col-span-2 animate-in fade-in slide-in-from-top-1.5 duration-200 ${
-                showAddUser
-                  ? "bg-slate-800/90 border-blue-500 shadow-lg shadow-blue-950/20 text-blue-400"
-                  : "bg-slate-800/40 border-slate-700/60 text-slate-200 hover:border-slate-600 hover:bg-slate-800/70"
-              }`}
-            > */}
-          {/* Visual Tech-Accent Bar */}
-          {/* <div
-                className={`absolute top-0 left-0 right-0 h-[3px] transition-all ${showAddUser ? "bg-blue-500" : "bg-transparent group-hover:bg-slate-500"}`}
-              />
-
-              <div className="flex flex-col gap-1.5 w-full">
-                <div className="flex justify-between items-center w-full">
-                  <span
-                    className={`text-[10px] font-mono tracking-widest uppercase transition-all ${showAddUser ? "text-blue-400" : "text-slate-500 group-hover:text-slate-400"}`}
-                  >
-                    CREATE PATRON
-                  </span>
-                  <span
-                    className={`text-xl transition-transform duration-300 ${showAddUser ? "rotate-45" : "group-hover:translate-x-1"}`}
-                  >
-                    {showAddUser ? "✖" : "👥"}
-                  </span>
-                </div>
-                <span className="font-black text-xl tracking-tight uppercase">
-                  {showAddUser ? "Close Patrons" : "Manage Patrons"}
-                </span>
-                <p className="text-xs text-slate-400 font-normal mt-2 leading-relaxed max-w-[240px]">
-                  Register incoming students and faculty, assign administrative
-                  privileges, and manage system login credentials.
-                </p>
-              </div>
-
-              <div
-                className={`mt-6 px-4 py-2 rounded-xl text-[10px] font-mono font-bold uppercase tracking-widest border transition-all ${
-                  showAddUser
-                    ? "bg-blue-500/10 border-blue-500/30 text-blue-400 animate-pulse"
-                    : "bg-slate-800 border-slate-700 text-slate-400 group-hover:text-slate-200 group-hover:border-slate-500"
-                }`}
-              >
-                {showAddUser
-                  ? "• CLICK TO CLOSE PATRONS"
-                  : "CLICK TO MANAGE PATRON"}
-              </div>
-            </button>
-          )} */}
-
-          {/* Manage Semester Configuration Settings Card */}
+          {/* Manage semester configuration settings */}
           {activeSection === "semester" && user.role === "admin" && (
             <div className="md:col-span-2 animate-in fade-in slide-in-from-top-1.5 duration-200">
               <SemesterSettingsCard
@@ -1226,7 +1068,7 @@ function Dashboard({ user, logout }) {
           )}
         </div>
 
-        {/* CALLING SEPARATE COMPONENTS */}
+        {/* Calling separate components */}
         {activeSection === "communities" &&
           (user.role === "admin" || user.role === "employee") && (
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 -mt-5 animate-in fade-in duration-300 -mt-18">
@@ -1246,7 +1088,7 @@ function Dashboard({ user, logout }) {
             </div>
           )}
 
-        {/* EBOOK SECTION CONDITIONAL TRIGGER MOUNT */}
+        {/* Ebook section conditional trigger mount */}
         {activeSection === "ebooks" && (
           <div className="mb-12 animate-in fade-in duration-200">
             <EbookManager
@@ -1263,7 +1105,7 @@ function Dashboard({ user, logout }) {
           </div>
         )}
 
-        {/* USER SECTION */}
+        {/* User section */}
         {activeSection === "patrons" && (
           <div className="mb-12 animate-in fade-in duration-200 -mt-15">
             <SearchFilters
@@ -1303,23 +1145,23 @@ function Dashboard({ user, logout }) {
           </div>
         )}
 
-        {/* PROFILE CONFIG EDIT MODULE ACCESS PANELS */}
+        {/* Edit rofile config */}
         {activeSection === "edit-profile" && (
           <div className="max-w-md mx-auto p-8 text-center bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-3xl font-mono animate-in fade-in duration-200">
             <h3 className="text-slate-200 text-xs font-bold uppercase tracking-wider">
-              👤 Account Identity Config
+              Account Identity Config
             </h3>
             <p className="text-[11px] text-slate-500 mt-2">
               Operator User:{" "}
               <span className="text-blue-400 font-bold">{user?.username}</span>
             </p>
             <div className="mt-6 p-4 border border-dashed border-slate-800 rounded-xl text-xs text-slate-600">
-              [ Profile Update UI Target Panel Container ]
+              Profile Update UI Target Panel Container
             </div>
           </div>
         )}
 
-        {/* SYSTEM REPOSITORY ABOUT CAP ACTIONS VIEW */}
+        {/* System repository, "about" tab */}
         {activeSection === "about" && (
           <div className="max-w-xl mx-auto p-8 bg-slate-900/30 backdrop-blur-xl border border-slate-800 rounded-3xl text-center space-y-4 font-mono animate-in fade-in duration-200">
             <h3 className="text-slate-200 font-black text-sm uppercase tracking-widest">
@@ -1336,126 +1178,129 @@ function Dashboard({ user, logout }) {
           </div>
         )}
 
-        {/* REPOSITORY / VAULT VIEW - Dynamic for Collections or active asset monitoring views */}
+        {/* Repository / Collections view - Dynamic for Collections or active asset monitoring views */}
         {(activeSection === "collections" ||
           activeSection === "home" ||
-          user.role === "student") && activeSection !== "ebooks" && (
-          <div className="bg-slate-800/30 rounded-2xl md:rounded-[2rem] border border-slate-700 p-4 sm:p-8 animate-in fade-in slide-in-from-top-1 duration-200 -mt-5">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xs font-mono text-slate-500 uppercase tracking-widest">
-                Repository Overview ({filteredFiles.length})
-              </h3>
-            </div>
-
-            {/* Search UI for Files */}
-            <SearchFilters
-              searchTerm={fileSearch}
-              setSearchTerm={setFileSearch}
-              selectedSector={fileSectorFilter}
-              setSelectedSector={setFileSectorFilter}
-              communities={communities}
-              type="Files"
-            />
-
-            {filteredFiles.length === 0 ? (
-              <div className="py-16 md:py-20 text-center border-2 border-slate-800 border-dashed rounded-2xl">
-                <p className="text-slate-600 font-mono text-xs sm:text-sm tracking-widest uppercase">
-                  [ No Matching Records Found ]
-                </p>
+          user.role === "student") &&
+          activeSection !== "ebooks" && (
+            <div className="bg-slate-800/30 rounded-2xl md:rounded-[2rem] border border-slate-700 p-4 sm:p-8 animate-in fade-in slide-in-from-top-1 duration-200 -mt-5">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xs font-mono text-slate-500 uppercase tracking-widest">
+                  Repository Overview ({filteredFiles.length})
+                </h3>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-3">
-                {filteredFiles.map((file) => (
-                  <div
-                    key={file.id}
-                    // Responsive Switch: Uses columns on mobile, shifts to row structure on sm: screens and up
-                    className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-all group gap-4 sm:gap-2"
-                  >
-                    {/* FILE DETAILS */}
-                    <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
-                      <span className="text-xl sm:text-2xl opacity-50 group-hover:opacity-100 shrink-0 mt-0.5 sm:mt-0">
-                        📄
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        {" "}
-                        {/* Prevents extremely long file titles from breaking layout */}
-                        <p className="font-bold text-sm sm:text-base text-slate-200 break-words line-clamp-2 sm:line-clamp-none">
-                          {file.filename}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 sm:mt-1">
-                          <p className="text-[9px] sm:text-[10px] font-mono text-slate-500 uppercase tracking-wide">
-                            UPLOADER: {file.uploaded_by}
+
+              {/* Search UI for Files */}
+              <SearchFilters
+                searchTerm={fileSearch}
+                setSearchTerm={setFileSearch}
+                selectedSector={fileSectorFilter}
+                setSelectedSector={setFileSectorFilter}
+                communities={communities}
+                type="Files"
+              />
+
+              {filteredFiles.length === 0 ? (
+                <div className="py-16 md:py-20 text-center border-2 border-slate-800 border-dashed rounded-2xl">
+                  <p className="text-slate-600 font-mono text-xs sm:text-sm tracking-widest uppercase">
+                    [ No Matching Records Found ]
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {filteredFiles.map((file) => (
+                    <div
+                      key={file.id}
+                      // Responsive Switch: Uses columns on mobile, shifts to row structure on sm: screens and up
+                      className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-all group gap-4 sm:gap-2"
+                    >
+                      {/* File details */}
+                      <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
+                        <span className="text-xl sm:text-2xl opacity-50 group-hover:opacity-100 shrink-0 mt-0.5 sm:mt-0">
+                          📄
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          {" "}
+                          {/* Prevents extremely long file titles from breaking layout */}
+                          <p className="font-bold text-sm sm:text-base text-slate-200 break-words line-clamp-2 sm:line-clamp-none">
+                            {file.filename}
                           </p>
-                          <span className="hidden sm:inline text-slate-700 text-[10px]">
-                            •
-                          </span>
-                          <span className="px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] sm:text-[9px] font-bold rounded uppercase tracking-tighter">
-                            Sector: {file.community_name || "General_Mesh"}
-                          </span>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 sm:mt-1">
+                            <p className="text-[9px] sm:text-[10px] font-mono text-slate-500 uppercase tracking-wide">
+                              UPLOADER: {file.uploaded_by}
+                            </p>
+                            <span className="hidden sm:inline text-slate-700 text-[10px]">
+                              •
+                            </span>
+                            <span className="px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] sm:text-[9px] font-bold rounded uppercase tracking-tighter">
+                              Sector: {file.community_name || "General_Mesh"}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* ACTIONS INTERFACE CONTAINER */}
-                    {/* Uses grid layouts on mobile to form 2 uniform button rows, restores clean horizontal layout on desktop */}
-                    <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-slate-700/50 sm:border-t-0">
-                      <button
-                        onClick={() =>
-                          handleViewFile(
-                            file.file_name ||
-                              file.filename ||
-                              file.name ||
-                              file.path,
-                          )
-                        }
-                        className="px-3 sm:px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
-                      >
-                        VIEW
-                      </button>
-
-                      {(user.role === "admin" || user.role === "employee") && (
-                        <button
-                          onClick={() => handleDownload(file.filename)}
-                          className="px-3 sm:px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
-                        >
-                          Download
-                        </button>
-                      )}
-
-                      <button
-                        onClick={() => {
-                          const text = generateAPA7(file);
-                          setActiveCitation(text);
-                          setShowCiteModal(true);
-                        }}
-                        className="px-3 sm:px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
-                      >
-                        Cite
-                      </button>
-
-                      {/* Delete button takes up full bottom space in mobile layout variant grid if user matches access rule */}
-                      {(user.role === "admin" || user.role === "employee") && (
+                      {/* Actions interface container */}
+                      {/* Uses grid layouts on mobile to form 2 uniform button rows, restores clean horizontal layout on desktop */}
+                      <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-slate-700/50 sm:border-t-0">
                         <button
                           onClick={() =>
-                            setConfirmModal({
-                              isOpen: true,
-                              targetId: file.id,
-                              type: "file",
-                            })
+                            handleViewFile(
+                              file.file_name ||
+                                file.filename ||
+                                file.name ||
+                                file.path,
+                            )
                           }
-                          className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all"
-                          title="Purge File Asset"
+                          className="px-3 sm:px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
                         >
-                          <DeleteIcon />
+                          VIEW
                         </button>
-                      )}
+
+                        {(user.role === "admin" ||
+                          user.role === "employee") && (
+                          <button
+                            onClick={() => handleDownload(file.filename)}
+                            className="px-3 sm:px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                          >
+                            Download
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => {
+                            const text = generateAPA7(file);
+                            setActiveCitation(text);
+                            setShowCiteModal(true);
+                          }}
+                          className="px-3 sm:px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                        >
+                          Cite
+                        </button>
+
+                        {/* Delete button takes up full bottom space in mobile layout variant grid if user matches access rule */}
+                        {(user.role === "admin" ||
+                          user.role === "employee") && (
+                          <button
+                            onClick={() =>
+                              setConfirmModal({
+                                isOpen: true,
+                                targetId: file.id,
+                                type: "file",
+                              })
+                            }
+                            className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all"
+                            title="Purge File Asset"
+                          >
+                            <DeleteIcon />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
         <CitationModal
           isOpen={showCiteModal}

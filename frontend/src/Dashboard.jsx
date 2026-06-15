@@ -721,7 +721,7 @@ function Dashboard({ user, logout }) {
             ? "TERMINATE COMMUNITY?"
             : confirmModal.type === "file"
               ? "PURGE ITEM FROM REPOSITORY?"
-              : "PURGE EBOOK??"
+              : "REMOVE?"
         }
         message={
           confirmModal.type === "community"

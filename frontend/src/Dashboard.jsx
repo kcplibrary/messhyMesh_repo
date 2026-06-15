@@ -730,8 +730,8 @@ function Dashboard({ user, logout }) {
               ? "Warning: This process will permanently erase this file asset binary from server storage disks and wipe its metadata indexing data row. This action cannot be undone."
               : "Warning: This process will immediately de-provision this user asset and permanently revoke all repository access permissions. This action cannot be undone."
         }
-        confirmText="EXECUTE PURGE"
-        cancelText="ABORT"
+        confirmText="Confirm"
+        cancelText="Cancel"
         isDestructive={true}
         onCancel={() =>
           setConfirmModal({ isOpen: false, targetId: null, type: null })

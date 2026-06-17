@@ -180,9 +180,9 @@ export default function EbookManager({
             }`}
           >
             {isUploading
-              ? "Syncing Media Node..."
+              ? "Uploading Ebook..."
               : selectedTargetComm
-                ? "Upload Ebook Asset"
+                ? "Upload Ebook"
                 : "Choose Sector First"}
             <input
               type="file"

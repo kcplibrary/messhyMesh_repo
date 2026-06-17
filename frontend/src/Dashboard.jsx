@@ -448,6 +448,7 @@ function Dashboard({ user, logout }) {
       });
       return;
     }
+    
     const formData = new FormData();
     formData.append("file", file);
     formData.append("uploader", user.username);
@@ -1010,7 +1011,7 @@ function Dashboard({ user, logout }) {
                   />
 
                   <textarea
-                    placeholder="DOCUMENT ABSTRACT / EXECUTIVE SUMMARY"
+                    placeholder="ABSTRACT / SUMMARY"
                     value={abstract}
                     onChange={(e) => setAbstract(e.target.value)}
                     rows={4}

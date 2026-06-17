@@ -15,6 +15,7 @@ import SemesterSettingsCard from "./components/SemesterSettingsCard.jsx";
 import ToastNotification from "./components/ToastNotification.jsx";
 import ConfirmationModal from "./components/ConfirmationModal.jsx";
 import EbookManager from "./components/EbookManager.jsx";
+import AbstractModal from "./components/AbstractModal.jsx";
 
 // const API_BASE = "http://localhost:8000/api";
 const API_BASE = "https://customer-yahoo-outing.ngrok-free.dev/backend/api";
@@ -55,6 +56,9 @@ function Dashboard({ user, logout }) {
   const [semEnd, setSemEnd] = useState("");
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [toast, setToast] = useState({ message: null, type: "success" });
+  const [selectedAbstractFile, setSelectedAbstractFile] = useState(null);
+  const [showAbstractModal, setShowAbstractModal] = useState(false);
+  const [abstract, setAbstract] = useState("");
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
     targetId: null,
@@ -452,6 +456,7 @@ function Dashboard({ user, logout }) {
     formData.append("paper_author", paperAuthor);
     formData.append("paper_year", paperYear);
     formData.append("keywords", paperKeywords);
+    formData.append("abstract", abstract);
 
     try {
       setIsUploading(true);
@@ -674,7 +679,6 @@ function Dashboard({ user, logout }) {
 
   const handleDownload = async (filename) => {
     try {
-
       // Fixed the syntax error, removed leading backslash and trailing backtick
       // const fileUrl = `http://localhost:8000/api/download.php?file=${filename}`;
       const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/download.php?file=${filename}`;
@@ -765,6 +769,16 @@ function Dashboard({ user, logout }) {
           }
           setConfirmModal({ isOpen: false, targetId: null, type: null });
         }}
+      />
+
+      <AbstractModal
+        isOpen={showAbstractModal}
+        file={selectedAbstractFile}
+        onClose={() => {
+          setShowAbstractModal(false);
+          setSelectedAbstractFile(null);
+        }}
+        onOpenPdf={handleViewFile} // 👈 Seamlessly reuse your exact view_file.php system!
       />
 
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
@@ -1003,6 +1017,14 @@ function Dashboard({ user, logout }) {
                     onChange={(e) => setPaperKeywords(e.target.value)}
                     className="w-full bg-blue-800/50 border border-blue-400/20 text-white p-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 ring-blue-300 placeholder:text-blue-300/50 transition-all"
                   />
+
+                  <textarea
+                    placeholder="DOCUMENT ABSTRACT / EXECUTIVE SUMMARY"
+                    value={abstract} // Make sure to initialize const [abstract, setAbstract] = useState(""); at the top
+                    onChange={(e) => setAbstract(e.target.value)}
+                    rows={4}
+                    className="w-full bg-slate-800/50 border border-slate-700 text-white p-2.5 sm:p-3 rounded-xl text-[11px] sm:text-xs font-bold outline-none focus:ring-2 ring-blue-500 transition-all placeholder:text-slate-500 resize-none"
+                  />
                 </div>
 
                 {/* Section selector*/}
@@ -1033,7 +1055,7 @@ function Dashboard({ user, logout }) {
                 >
                   {/* Traffic handler logic */}
                   {isUploading
-                    ? "Routing to Sector Archive..."
+                    ? "Routing to Sector Collections..."
                     : selectedTargetComm
                       ? "Upload Archive"
                       : "Choose Community First"}
@@ -1223,7 +1245,12 @@ function Dashboard({ user, logout }) {
                           {" "}
                           {/* Prevents extremely long file titles from breaking layout */}
                           <p className="font-bold text-sm sm:text-base text-slate-200 break-words line-clamp-2 sm:line-clamp-none">
-                            {file.filename}
+                            {/* {file.filename} */}
+                            {
+                              user && user.role === "student"
+                                ? file.paper_title || file.filename // Students see the clean Title field (fallback to filename if empty)
+                                : file.filename // Admins and Employees see the full timestamp file identifier
+                            }
                           </p>
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 sm:mt-1">
                             <p className="text-[9px] sm:text-[10px] font-mono text-slate-500 uppercase tracking-wide">
@@ -1243,13 +1270,17 @@ function Dashboard({ user, logout }) {
                       {/* Uses grid layouts on mobile to form 2 uniform button rows, restores clean horizontal layout on desktop */}
                       <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-slate-700/50 sm:border-t-0">
                         <button
-                          onClick={() =>
-                            handleViewFile(
-                              file.file_name ||
-                                file.filename ||
-                                file.name ||
-                                file.path,
-                            )
+                          onClick={
+                            () => {
+                              setSelectedAbstractFile(file); // 👈 Pass the full database file entity array metrics
+                              setShowAbstractModal(true); // 👈 Slide up the abstract display screen view
+                            }
+                            // handleViewFile(
+                            //   file.file_name ||
+                            //     file.filename ||
+                            //     file.name ||
+                            //     file.path,
+                            // )
                           }
                           className="px-3 sm:px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
                         >

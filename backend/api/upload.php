@@ -25,6 +25,7 @@ $paperTitle = $_POST['paper_title'] ?? null;
 $paperAuthor = $_POST['paper_author'] ?? null;
 $paperYear = $_POST['paper_year'] ?? null;
 $keywords = $_POST['keywords'] ?? '';
+$abstract = $_POST['abstract'] ?? null;
 
 if (empty($community_id) || $community_id === "null") {
     http_response_code(400);
@@ -62,7 +63,7 @@ if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
         $timestamp = date("Y-m-d H:i:s"); 
 
         $stmt = $pdo->prepare("INSERT INTO files (filename, community_id, uploaded_by, upload_date, paper_title, paper_author, paper_year, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$fileName, (int)$community_id, $uploader, $timestamp, $paperTitle, $paperAuthor, $paperYear, $keywords]);
+        $stmt->execute([$fileName, (int)$community_id, $uploader, $timestamp, $paperTitle, $paperAuthor, $paperYear, $keywords, $abstract]);
         
         echo json_encode([
             "status" => "success", 

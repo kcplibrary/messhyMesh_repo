@@ -37,6 +37,16 @@ function App() {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
+  useEffect(() => {
+    if (!message) return;
+
+    const messageTimer = setTimeout(() => {
+      setMessage("");
+    }, 4000);
+
+    return () => clearTimeout(messageTimer);
+  }, [message]);
+
   const fetchCommunities = useCallback(async () => {
     try {
       const targetUrl =

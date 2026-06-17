@@ -62,11 +62,11 @@ if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
         global $pdo; 
         $timestamp = date("Y-m-d H:i:s"); 
 
-        $stmt = $pdo->prepare("INSERT INTO files (filename, community_id, uploaded_by, upload_date, paper_title, paper_author, paper_year, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO files (filename, community_id, uploaded_by, upload_date, paper_title, paper_author, paper_year, keywords, abstract) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$fileName, (int)$community_id, $uploader, $timestamp, $paperTitle, $paperAuthor, $paperYear, $keywords, $abstract]);
         
         echo json_encode([
-            "status" => "success", 
+            "status" => "success",
             "message" => "Asset verified, indexed, and securely archived in teh repository.",
             "file" => $fileName
         ]);

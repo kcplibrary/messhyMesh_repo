@@ -472,6 +472,7 @@ function Dashboard({ user, logout }) {
         setPaperYear("");
         setPaperKeywords("");
         setSelectedTargetComm("");
+        setAbstract("");
 
         setToast({
           message:
@@ -771,16 +772,6 @@ function Dashboard({ user, logout }) {
         }}
       />
 
-      <AbstractModal
-        isOpen={showAbstractModal}
-        file={selectedAbstractFile}
-        onClose={() => {
-          setShowAbstractModal(false);
-          setSelectedAbstractFile(null);
-        }}
-        onOpenPdf={handleViewFile} // 👈 Seamlessly reuse your exact view_file.php system!
-      />
-
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
         <Spline scene="https://prod.spline.design/fyKP5gxeJ0N1Ae9c/scene.splinecode" />
 
@@ -1020,7 +1011,7 @@ function Dashboard({ user, logout }) {
 
                   <textarea
                     placeholder="DOCUMENT ABSTRACT / EXECUTIVE SUMMARY"
-                    value={abstract} // Make sure to initialize const [abstract, setAbstract] = useState(""); at the top
+                    value={abstract}
                     onChange={(e) => setAbstract(e.target.value)}
                     rows={4}
                     className="w-full bg-slate-800/50 border border-slate-700 text-white p-2.5 sm:p-3 rounded-xl text-[11px] sm:text-xs font-bold outline-none focus:ring-2 ring-blue-500 transition-all placeholder:text-slate-500 resize-none"
@@ -1337,6 +1328,16 @@ function Dashboard({ user, logout }) {
           isOpen={showCiteModal}
           citation={activeCitation}
           onClose={() => setShowCiteModal(false)}
+        />
+
+        <AbstractModal
+          isOpen={showAbstractModal}
+          file={selectedAbstractFile}
+          onClose={() => {
+            setShowAbstractModal(false);
+            setSelectedAbstractFile(null);
+          }}
+          onOpenPdf={handleViewFile} // Seamlessly reuse your exact view_file.php system!
         />
 
         {statusMsg && (

@@ -17,12 +17,12 @@ try {
     global $pdo;
     
     // Structured LEFT JOIN query to fetch metadata alongside the sector names
-    // Aligned to match your get_files template pattern (eb.* and community_name)
+    // Aligned to match your get_files template pattern (eb.* and collection)
     $sql = "SELECT 
                 eb.*, 
-                c.name AS community_name 
+                c.name AS collection_name 
             FROM ebooks eb
-            LEFT JOIN communities c ON eb.community_id = c.id 
+            LEFT JOIN communities c ON eb.collection_id = c.id 
             ORDER BY eb.upload_date DESC";
 
     $stmt = $pdo->query($sql);
@@ -31,8 +31,8 @@ try {
     // Data Normalization: Ensure IDs are true integers so React doesn't trip on type mismatches
     foreach ($ebooks as &$book) {
         $book['id'] = (int)$book['id'];
-        if ($book['community_id'] !== null) {
-            $book['community_id'] = (int)$book['community_id'];
+        if ($book['collection_id'] !== null) {
+            $book['collection_id'] = (int)$book['collection_id'];
         }
     }
     unset($book); // Clear reference pointer safely

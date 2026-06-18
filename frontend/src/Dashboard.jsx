@@ -66,6 +66,10 @@ function Dashboard({ user, logout }) {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [ebooksList, setEbooksList] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [newCollName, setNewCollName] = useState("");
+  const [editingCollId, setEditingCollId] = useState(null);
+  const [editCollName, setEditCollName] = useState("");
 
   // Stats check
   const [stats, setStats] = useState({
@@ -205,6 +209,20 @@ function Dashboard({ user, logout }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const fetchCollections = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        `${API_BASE}/get_collections.php`,
+        ngrokConfig,
+      );
+      if (Array.isArray(res.data)) setCollections(res.data);
+    } catch (err) {
+      console.error("Collection Fetch Error:", err);
+      setStatusMsg("Failed to sync collection registries.");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const fetchStats = useCallback(async (filters = null) => {
     try {
       // Build dynamic params configuration object
@@ -251,7 +269,8 @@ function Dashboard({ user, logout }) {
     fetchCommunities();
     fetchStats();
     fetchEbooks();
-  }, [fetchFiles, fetchUsers, fetchCommunities, fetchStats, fetchEbooks]);
+    fetchCollections();
+  }, [fetchFiles, fetchUsers, fetchCommunities, fetchStats, fetchEbooks, fetchCollections]);
 
   const handleUpdateUser = async (id) => {
     if (!editUsername.trim()) {
@@ -448,7 +467,7 @@ function Dashboard({ user, logout }) {
       });
       return;
     }
-    
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("uploader", user.username);
@@ -534,6 +553,96 @@ function Dashboard({ user, logout }) {
     window.open(fileUrl, "_blank");
   };
 
+const handleCreateCollection = async (e) => {
+    e.preventDefault();
+
+    if (!newCollName.trim()) {
+      setToast({
+        message: "Initialization rejected: Collection name cannot be empty.",
+        type: "error",
+      });
+      return;
+    }
+
+    try {
+      const res = await axios.post(`${API_BASE}/create_collection.php`, {
+        name: newCollName.trim(),
+      });
+
+      if (res.data.status === "success") {
+        setNewCollName(""); // Clear the text input instantly
+
+        setToast({
+          message: res.data.message || `Collection successfully initialized.`,
+          type: "success",
+        });
+
+        // 🌟 SINGLE SOURCE OF TRUTH: Force a single fresh database pull
+        if (typeof fetchCollections === "function") {
+          await fetchCollections(); 
+        }
+        if (typeof fetchStats === "function") {
+          await fetchStats();
+        }
+
+      } else {
+        setToast({
+          message: res.data.message || "Initialization aborted by engine.",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setToast({
+        message: err.response?.data?.message || "System Error: Handshake exception.",
+        type: "error",
+      });
+    }
+  };
+
+const handleRenameCollection = async (id) => {
+  if (!editCollName.trim()) {
+    setToast({
+      message: "Modification aborted: Target value cannot be empty.",
+      type: "error",
+    });
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      `${API_BASE}/update_collection.php`,
+      { id: id, name: editCollName.trim() }
+    );
+
+    if (response.data.status === "success") {
+      // Optimistically update frontend state list array array mapping
+      setCollections(
+        collections.map((c) =>
+          c.id === id ? { ...c, name: editCollName.trim() } : c
+        )
+      );
+      setEditingCollId(null); // Exit inline edit view mode
+
+      setToast({
+        message: response.data.message || "Collection name updated cleanly.",
+        type: "success",
+      });
+    } else {
+      setToast({
+        message: response.data.message || "Modification payload rejected.",
+        type: "error",
+      });
+    }
+  } catch (err) {
+    console.error("Rename Collection Error:", err);
+    setToast({
+      message: err.response?.data?.message || "System Error: Failed to rewrite collection asset data.",
+      type: "error",
+    });
+  }
+};
+
   const handleCreateCommunity = async (e) => {
     e.preventDefault();
 
@@ -584,6 +693,43 @@ function Dashboard({ user, logout }) {
         message:
           err.response?.data?.message ||
           "System Error: Severe handshake exception during sector initialization.",
+        type: "error",
+      });
+    }
+  };
+
+    const handleDeleteCollection = async (id) => {
+    if (!id) return;
+
+    try {
+      const response = await axios.post(
+        `${API_BASE}/delete_collection.php`,
+        { id },
+      );
+      if (response.data.status === "success") {
+        if (typeof fetchCollections === "function") await fetchCollections();
+        setCollections(collections.filter((c) => c.id !== id));
+
+        setToast({
+          message:
+            response.data.message ||
+            "Collection records permanently purged from repository configuration.",
+          type: "success",
+        });
+      } else {
+        setToast({
+          message:
+            response.data.message ||
+            "Termination request refused by repository core.",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setToast({
+        message:
+          err.response?.data?.message ||
+          "Termination failed: Severe handshake exception with core server database.",
         type: "error",
       });
     }
@@ -720,20 +866,24 @@ function Dashboard({ user, logout }) {
         onClose={() => setToast({ message: null, type: "success" })}
       />
 
-      <ConfirmationModal
+<ConfirmationModal
         isOpen={confirmModal.isOpen}
         title={
           confirmModal.type === "community"
             ? "TERMINATE COMMUNITY?"
             : confirmModal.type === "file"
               ? "PURGE ITEM FROM REPOSITORY?"
-              : "REMOVE?"
+              : confirmModal.type === "collection"
+                ? "TERMINATE COLLECTION?" // 🌟 Dynamic title update
+                : "REMOVE?"
         }
         message={
           confirmModal.type === "community"
             ? "Warning: This process will permanently dissolve this community sector block. Any connection links mapped here will be severed. This action cannot be undone."
             : confirmModal.type === "file"
               ? "Warning: This process will permanently erase this file asset binary from server storage disks and wipe its metadata indexing data row. This action cannot be undone."
+            : confirmModal.type === "collection"
+              ? "Warning: This process will permanently dissolve this collection library. Attached assets will be de-referenced. This action cannot be undone." // 🌟 Warning context text
               : "Warning: This process will immediately de-provision this user asset and permanently revoke all repository access permissions. This action cannot be undone."
         }
         confirmText="Confirm"
@@ -745,6 +895,8 @@ function Dashboard({ user, logout }) {
         onConfirm={async () => {
           if (confirmModal.type === "community") {
             await handleDeleteCommunity(confirmModal.targetId);
+          } else if (confirmModal.type === "collection") {
+            await handleDeleteCollection(confirmModal.targetId); // 🌟 Direct function trigger link
           } else if (confirmModal.type === "file") {
             await handleDeleteFile(confirmModal.targetId);
           } else if (confirmModal.type === "ebook") {
@@ -1098,6 +1250,16 @@ function Dashboard({ user, logout }) {
                 handleRename={handleRename}
                 handleDeleteCommunity={handleDeleteCommunity}
                 setConfirmModal={setConfirmModal}
+                collections={collections}
+                newCollName={newCollName}
+                setNewCollName={setNewCollName}
+                handleCreateCollection={handleCreateCollection}
+                editingCollId={editingCollId}
+                setEditingCollId={setEditingCollId}
+                editCollName={editCollName}
+                setEditCollName={setEditCollName}
+                handleRenameCollection={handleRenameCollection}
+                handleDeleteCollection={handleDeleteCollection}
               />
             </div>
           )}
@@ -1107,7 +1269,8 @@ function Dashboard({ user, logout }) {
           <div className="mb-12 animate-in fade-in duration-200">
             <EbookManager
               user={user}
-              communities={communities}
+              // communities={communities}
+              collections={collections}
               ebooksList={ebooksList}
               fetchEbooks={fetchEbooks}
               fetchStats={fetchStats}
@@ -1192,7 +1355,7 @@ function Dashboard({ user, logout }) {
           </div>
         )}
 
-        {/* Repository / Collections view - Dynamic for Collections or active asset monitoring views */}
+ {/* Repository / Collections view - Dynamic for Collections or active asset monitoring views */}
         {(activeSection === "collections" ||
           activeSection === "home" ||
           user.role === "student") &&
@@ -1223,28 +1386,25 @@ function Dashboard({ user, logout }) {
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {filteredFiles.map((file) => (
+                    /* 🟢 FIXED: Forced to 'flex-col' unconditionally. Filename stays on top, buttons go below. */
                     <div
                       key={file.id}
-                      // Responsive Switch: Uses columns on mobile, shifts to row structure on sm: screens and up
-                      className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-all group gap-4 sm:gap-2"
+                      className="flex flex-col bg-slate-800/50 p-4 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-all group gap-4 w-full overflow-hidden"
                     >
-                      {/* File details */}
-                      <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
-                        <span className="text-xl sm:text-2xl opacity-50 group-hover:opacity-100 shrink-0 mt-0.5 sm:mt-0">
+                      {/* File details - Top Row */}
+                      <div className="flex items-start gap-3 sm:gap-4 w-full min-w-0">
+                        <span className="text-xl sm:text-2xl opacity-50 group-hover:opacity-100 shrink-0 mt-0.5">
                           📄
                         </span>
                         <div className="min-w-0 flex-1">
-                          {" "}
-                          {/* Prevents extremely long file titles from breaking layout */}
-                          <p className="font-bold text-sm sm:text-base text-slate-200 break-words line-clamp-2 sm:line-clamp-none">
-                            {/* {file.filename} */}
+                          <p className="font-bold text-sm sm:text-base text-slate-200 break-all sm:break-words">
                             {
                               user && user.role === "student"
-                                ? file.paper_title || file.filename // Students see the clean Title field (fallback to filename if empty)
-                                : file.filename // Admins and Employees see the full timestamp file identifier
+                                ? file.paper_title || file.filename
+                                : file.filename
                             }
                           </p>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 sm:mt-1">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
                             <p className="text-[9px] sm:text-[10px] font-mono text-slate-500 uppercase tracking-wide">
                               UPLOADER: {file.uploaded_by}
                             </p>
@@ -1258,49 +1418,43 @@ function Dashboard({ user, logout }) {
                         </div>
                       </div>
 
-                      {/* Actions interface container */}
-                      {/* Uses grid layouts on mobile to form 2 uniform button rows, restores clean horizontal layout on desktop */}
-                      <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-slate-700/50 sm:border-t-0">
-                        <button
-                          onClick={
-                            () => {
-                              setSelectedAbstractFile(file); // 👈 Pass the full database file entity array metrics
-                              setShowAbstractModal(true); // 👈 Slide up the abstract display screen view
-                            }
-                            // handleViewFile(
-                            //   file.file_name ||
-                            //     file.filename ||
-                            //     file.name ||
-                            //     file.path,
-                            // )
-                          }
-                          className="px-3 sm:px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
-                        >
-                          VIEW
-                        </button>
-
-                        {(user.role === "admin" ||
-                          user.role === "employee") && (
+                      {/* Actions interface container - Bottom Row */}
+                      {/* 🟢 FIXED: Changed grid/flex combo to a clean flex-row with justify-between */}
+                      <div className="flex items-center justify-between pt-3 border-t border-slate-700/50 w-full gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <button
-                            onClick={() => handleDownload(file.filename)}
-                            className="px-3 sm:px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                            onClick={() => {
+                              setSelectedAbstractFile(file);
+                              setShowAbstractModal(true);
+                            }}
+                            className="px-3 sm:px-4 py-2 bg-slate-700 hover:bg-blue-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center text-slate-200"
                           >
-                            Download
+                            VIEW
                           </button>
-                        )}
 
-                        <button
-                          onClick={() => {
-                            const text = generateAPA7(file);
-                            setActiveCitation(text);
-                            setShowCiteModal(true);
-                          }}
-                          className="px-3 sm:px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
-                        >
-                          Cite
-                        </button>
+                          {(user.role === "admin" ||
+                            user.role === "employee") && (
+                            <button
+                              onClick={() => handleDownload(file.filename)}
+                              className="px-3 sm:px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                            >
+                              Download
+                            </button>
+                          )}
 
-                        {/* Delete button takes up full bottom space in mobile layout variant grid if user matches access rule */}
+                          <button
+                            onClick={() => {
+                              const text = generateAPA7(file);
+                              setActiveCitation(text);
+                              setShowCiteModal(true);
+                            }}
+                            className="px-3 sm:px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                          >
+                            Cite
+                          </button>
+                        </div>
+
+                        {/* Delete icon perfectly aligned to the right side */}
                         {(user.role === "admin" ||
                           user.role === "employee") && (
                           <button
@@ -1311,7 +1465,7 @@ function Dashboard({ user, logout }) {
                                 type: "file",
                               })
                             }
-                            className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all"
+                            className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all shrink-0"
                             title="Purge File Asset"
                           >
                             <DeleteIcon />

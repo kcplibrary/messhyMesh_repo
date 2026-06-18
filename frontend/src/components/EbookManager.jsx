@@ -5,7 +5,7 @@ import SearchFilters from "./SearchFilters";
 
 export default function EbookManager({
   user,
-  communities,
+  collections, // 🌟 Changed from communities
   ebooksList,
   fetchEbooks,
   fetchStats,
@@ -18,10 +18,10 @@ export default function EbookManager({
   const [bookAuthor, setBookAuthor] = useState("");
   const [bookYear, setBookYear] = useState("");
   const [subjectTags, setSubjectTags] = useState("");
-  const [selectedTargetComm, setSelectedTargetComm] = useState("");
+  const [selectedTargetColl, setSelectedTargetColl] = useState(""); // 🌟 Updated state variable pointer
   const [isUploading, setIsUploading] = useState(false);
   const [ebookSearch, setEbookSearch] = useState("");
-  const [ebookSectorFilter, setEbookSectorFilter] = useState("");
+  const [ebookCollectionFilter, setEbookCollectionFilter] = useState(""); // 🌟 Updated state variable pointer
 
   // Search filter node logic
   const filteredEbooks = (ebooksList || []).filter((b) => {
@@ -32,18 +32,19 @@ export default function EbookManager({
       (b.book_author || "").toLowerCase().includes(searchTerm) ||
       (b.subject_tags || "").toLowerCase().includes(searchTerm);
 
-    const matchesSector =
-      ebookSectorFilter === "" ||
-      String(b.community_id) === String(ebookSectorFilter);
+    // 🌟 Check matches against collection_id metadata instead of community_id
+    const matchesCollection =
+      ebookCollectionFilter === "" ||
+      String(b.collection_id) === String(ebookCollectionFilter);
 
-    return matchesSearch && matchesSector;
+    return matchesSearch && matchesCollection;
   });
 
   const handleEbookUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file || !selectedTargetComm) {
+    if (!file || !selectedTargetColl) {
       setToast({
-        message: "SYSTEM_REJECTION: Select a Target Sector and load a valid document asset first.",
+        message: "SYSTEM_REJECTION: Select a Target Collection and load a valid document asset first.",
         type: "error",
       });
       return;
@@ -52,7 +53,7 @@ export default function EbookManager({
     const formData = new FormData();
     formData.append("file", file);
     formData.append("uploader", user.username);
-    formData.append("community_id", String(selectedTargetComm));
+    formData.append("collection_id", String(selectedTargetColl)); // 🌟 Updated field flag to collection_id
     formData.append("book_title", bookTitle);
     formData.append("book_author", bookAuthor);
     formData.append("book_year", bookYear);
@@ -69,7 +70,7 @@ export default function EbookManager({
         setBookAuthor("");
         setBookYear("");
         setSubjectTags("");
-        setSelectedTargetComm("");
+        setSelectedTargetColl("");
         setToast({ message: res.data.message, type: "success" });
         if (typeof fetchEbooks === "function") await fetchEbooks();
         if (typeof fetchStats === "function") await fetchStats();
@@ -120,7 +121,7 @@ export default function EbookManager({
               Manage Digital Ebooks
             </span>
             <p className="text-[11px] sm:text-xs text-slate-400 mt-1 sm:mt-2 leading-relaxed max-w-xl">
-              Index textbook assets, append structural classifications, and archive data clusters into specific sectors.
+              Index textbook assets, append structural classifications, and archive data clusters into specific collections.
             </p>
           </div>
 
@@ -156,13 +157,14 @@ export default function EbookManager({
           </div>
 
           <div className="mt-3">
+            {/* 🌟 Drops down options built directly from collections array maps */}
             <select
-              value={selectedTargetComm}
-              onChange={(e) => setSelectedTargetComm(e.target.value)}
+              value={selectedTargetColl}
+              onChange={(e) => setSelectedTargetColl(e.target.value)}
               className="w-full bg-slate-800 border border-slate-700 text-slate-300 p-2.5 sm:p-3 rounded-xl text-[11px] sm:text-xs font-bold outline-none focus:ring-2 ring-indigo-500 transition-all cursor-pointer appearance-none"
             >
-              <option value="">SELECT ASSIGNED SECTOR</option>
-              {communities.map((c) => (
+              <option value="">SELECT ASSIGNED COLLECTION</option>
+              {collections.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
@@ -174,21 +176,21 @@ export default function EbookManager({
             className={`mt-4 p-3 sm:p-4 rounded-2xl font-black text-[11px] sm:text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-widest border active:scale-[0.98] w-full max-w-xs mx-auto ${
               isUploading
                 ? "bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed animate-pulse"
-                : selectedTargetComm
+                : selectedTargetColl
                   ? "bg-white text-indigo-600 border-white hover:bg-slate-100 cursor-pointer"
                   : "bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed opacity-50"
             }`}
           >
             {isUploading
               ? "Uploading Ebook..."
-              : selectedTargetComm
+              : selectedTargetColl
                 ? "Upload Ebook"
-                : "Choose Sector First"}
+                : "Choose Collection First"}
             <input
               type="file"
               className="hidden"
               onChange={handleEbookUpload}
-              disabled={!selectedTargetComm || isUploading}
+              disabled={!selectedTargetColl || isUploading}
             />
           </label>
         </div>
@@ -202,12 +204,13 @@ export default function EbookManager({
           </h3>
         </div>
 
+        {/* 🌟 Pass collections data parameters to filter bar dropdown layouts */}
         <SearchFilters
           searchTerm={ebookSearch}
           setSearchTerm={setEbookSearch}
-          selectedSector={ebookSectorFilter}
-          setSelectedSector={setEbookSectorFilter}
-          communities={communities}
+          selectedSector={ebookCollectionFilter}
+          setSelectedSector={setEbookCollectionFilter}
+          communities={collections} 
           type="Ebooks"
         />
 
@@ -220,19 +223,18 @@ export default function EbookManager({
         ) : (
           <div className="grid grid-cols-1 gap-3">
             {filteredEbooks.map((book) => (
+              /* 🟢 FIXED: Outer wrapper forced into strict flex-col layout configuration */
               <div
                 key={book.id}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700 hover:border-indigo-500/50 transition-all group gap-4"
+                className="flex flex-col bg-slate-800/50 p-4 sm:p-5 rounded-2xl border border-slate-700 hover:border-indigo-500/50 transition-all group gap-4 w-full overflow-hidden"
               >
+                {/* 📁 TOP CONTAINER: Book Metadata Fields */}
                 <div className="flex items-start gap-3 sm:gap-4 min-w-0 w-full">
-                  {/* <span className="text-xl sm:text-2xl opacity-50 group-hover:opacity-100 shrink-0 select-none">
-                    
-                  </span> */}
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-200 text-sm sm:text-base break-words line-clamp-2 sm:line-clamp-none">
+                    <p className="font-bold text-slate-200 text-sm sm:text-base break-all sm:break-words">
                       {book.book_title || book.filename}
                     </p>
-                    <p className="text-xs text-slate-400 font-medium mt-0.5 truncate">
+                    <p className="text-xs text-slate-400 font-medium mt-1 truncate">
                       By {book.book_author || "Unknown"} ({book.book_year || "N/A"})
                     </p>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
@@ -242,33 +244,38 @@ export default function EbookManager({
                       <span className="hidden sm:inline text-slate-700 text-[10px]">
                         •
                       </span>
+                      {/* 🌟 Displays collection names dynamically mapped from the join */}
                       <span className="px-1.5 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[8px] font-bold rounded uppercase">
-                        Sector: {book.community_name || "General Library"}
+                        Collection: {book.collection_name || "General Library"}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Action interface container */}
-                <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-slate-700/50 sm:border-t-0 justify-end">
+                {/* ⚡ BOTTOM CONTAINER: Actions interface block aligned layout safely stacked underneath */}
+                <div className="flex items-center justify-between pt-3 border-t border-slate-700/50 w-full gap-2">
                   
-                  <button
-                    onClick={() => handleViewEbook(book.filename)}
-                    className="px-3 sm:px-4 py-2 bg-slate-700 hover:bg-indigo-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center text-slate-200 hover:text-white"
-                  >
-                    VIEW
-                  </button>
-
-                  {/* DOWNLOAD BUTTON */}
-                  {(user.role === "admin" || user.role === "employee") && (
+                  {/* Primary Functional Action Buttons Group */}
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
-                      onClick={() => handleDownload(book.filename)}
-                      className="px-3 sm:px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center"
+                      onClick={() => handleViewEbook(book.filename)}
+                      className="px-4 py-2 bg-slate-700 hover:bg-indigo-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center text-slate-200 hover:text-white whitespace-nowrap"
                     >
-                      Download
+                      VIEW
                     </button>
-                  )}
 
+                    {/* DOWNLOAD BUTTON */}
+                    {(user.role === "admin" || user.role === "employee") && (
+                      <button
+                        onClick={() => handleDownload(book.filename)}
+                        className="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center whitespace-nowrap"
+                      >
+                        Download
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Standalone administrative delete system anchor */}
                   {(user.role === "admin" || user.role === "employee") && (
                     <button
                       onClick={() =>
@@ -278,7 +285,8 @@ export default function EbookManager({
                           type: "ebook",
                         })
                       }
-                      className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all flex items-center justify-center mx-auto sm:mx-0"
+                      className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-lg transition-all flex items-center justify-center shrink-0"
+                      title="Purge Ebook Asset"
                     >
                       <DeleteIcon />
                     </button>

@@ -21,13 +21,13 @@ if (!isset($_FILES['file'])) {
 }
 
 $uploader = $_POST['uploader'] ?? 'system'; 
-$community_id = $_POST['community_id'] ?? null; 
+$collection_id = $_POST['collection_id'] ?? null;
 $bookTitle = $_POST['book_title'] ?? null;
 $bookAuthor = $_POST['book_author'] ?? null;
 $bookYear = $_POST['book_year'] ?? null;
 $subjectTags = $_POST['subject_tags'] ?? ''; // Behaves like your 'keywords' string parameter
 
-if (empty($community_id) || $community_id === "null") {
+if (empty($collection_id) || $collection_id === "null") {
     http_response_code(400);
     echo json_encode(["status" => "error", "message" => "Routing Error: Select a Sector first."]);
     exit;
@@ -63,8 +63,8 @@ if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
         $timestamp = date("Y-m-d H:i:s"); 
 
         // TARGETS EBOOKS TABLE STRUCTURE matching your design standards
-        $stmt = $pdo->prepare("INSERT INTO ebooks (filename, community_id, uploaded_by, upload_date, book_title, book_author, book_year, subject_tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$fileName, (int)$community_id, $uploader, $timestamp, $bookTitle, $bookAuthor, $bookYear, $subjectTags]);
+        $stmt = $pdo->prepare("INSERT INTO ebooks (filename, collection_id, uploaded_by, upload_date, book_title, book_author, book_year, subject_tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$fileName, (int)$collection_id, $uploader, $timestamp, $bookTitle, $bookAuthor, $bookYear, $subjectTags]);
         
         echo json_encode([
             "status" => "success", 

@@ -261,7 +261,7 @@ export default function EbookManager({
                       onClick={() => handleViewEbook(book.filename)}
                       className="px-4 py-2 bg-slate-700 hover:bg-indigo-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase transition-all text-center text-slate-200 hover:text-white whitespace-nowrap"
                     >
-                      VIEW
+                      READ
                     </button>
 
                     {/* DOWNLOAD BUTTON */}

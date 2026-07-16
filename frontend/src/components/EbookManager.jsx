@@ -5,7 +5,7 @@ import SearchFilters from "./SearchFilters";
 
 export default function EbookManager({
   user,
-  collections, // 🌟 Changed from communities
+  collections, // 🌟 This array contains your list items
   ebooksList,
   fetchEbooks,
   fetchStats,
@@ -18,10 +18,10 @@ export default function EbookManager({
   const [bookAuthor, setBookAuthor] = useState("");
   const [bookYear, setBookYear] = useState("");
   const [subjectTags, setSubjectTags] = useState("");
-  const [selectedTargetColl, setSelectedTargetColl] = useState(""); // 🌟 Updated state variable pointer
+  const [selectedTargetColl, setSelectedTargetColl] = useState(""); 
   const [isUploading, setIsUploading] = useState(false);
   const [ebookSearch, setEbookSearch] = useState("");
-  const [ebookCollectionFilter, setEbookCollectionFilter] = useState(""); // 🌟 Updated state variable pointer
+  const [ebookCollectionFilter, setEbookCollectionFilter] = useState(""); 
 
   // Search filter node logic
   const filteredEbooks = (ebooksList || []).filter((b) => {
@@ -32,7 +32,6 @@ export default function EbookManager({
       (b.book_author || "").toLowerCase().includes(searchTerm) ||
       (b.subject_tags || "").toLowerCase().includes(searchTerm);
 
-    // 🌟 Check matches against collection_id metadata instead of community_id
     const matchesCollection =
       ebookCollectionFilter === "" ||
       String(b.collection_id) === String(ebookCollectionFilter);
@@ -42,9 +41,9 @@ export default function EbookManager({
 
   const handleEbookUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file || !selectedTargetColl) {
+    if (!file || !selectedTargetColl || selectedTargetColl === "undefined") {
       setToast({
-        message: "SYSTEM_REJECTION: Select a Target Collection and load a valid document asset first.",
+        message: "SYSTEM_REJECTION: Select a Target Area and load a valid document asset first.",
         type: "error",
       });
       return;
@@ -53,7 +52,7 @@ export default function EbookManager({
     const formData = new FormData();
     formData.append("file", file);
     formData.append("uploader", user.username);
-    formData.append("collection_id", String(selectedTargetColl)); // 🌟 Updated field flag to collection_id
+    formData.append("collection_id", String(selectedTargetColl)); 
     formData.append("book_title", bookTitle);
     formData.append("book_author", bookAuthor);
     formData.append("book_year", bookYear);
@@ -121,7 +120,7 @@ export default function EbookManager({
               Manage Digital Ebooks
             </span>
             <p className="text-[11px] sm:text-xs text-slate-400 mt-1 sm:mt-2 leading-relaxed max-w-xl">
-              Index textbook assets, append structural classifications, and archive data clusters into specific collections.
+              Index textbook assets, append structural classifications, and archive data clusters into specific targets.
             </p>
           </div>
 
@@ -157,18 +156,21 @@ export default function EbookManager({
           </div>
 
           <div className="mt-3">
-            {/* 🌟 Drops down options built directly from collections array maps */}
             <select
               value={selectedTargetColl}
               onChange={(e) => setSelectedTargetColl(e.target.value)}
               className="w-full bg-slate-800 border border-slate-700 text-slate-300 p-2.5 sm:p-3 rounded-xl text-[11px] sm:text-xs font-bold outline-none focus:ring-2 ring-indigo-500 transition-all cursor-pointer appearance-none"
             >
-              <option value="">SELECT ASSIGNED COLLECTION</option>
-              {collections.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
+              <option value="">SELECT ASSIGNED DEPT / COMMUNITY / COLLECTION</option>
+              {collections.map((c) => {
+                {/* 🌟 CRITICAL FIX: If the list items have a community_id property, we prioritize it to satisfy the database constraint */}
+                const targetId = c.community_id || c.id;
+                return (
+                  <option key={c.id || targetId} value={targetId}>
+                    {c.name || c.community_name || "Unnamed Sector"}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
@@ -176,27 +178,27 @@ export default function EbookManager({
             className={`mt-4 p-3 sm:p-4 rounded-2xl font-black text-[11px] sm:text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-widest border active:scale-[0.98] w-full max-w-xs mx-auto ${
               isUploading
                 ? "bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed animate-pulse"
-                : selectedTargetColl
+                : (selectedTargetColl && selectedTargetColl !== "undefined")
                   ? "bg-white text-indigo-600 border-white hover:bg-slate-100 cursor-pointer"
                   : "bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed opacity-50"
             }`}
           >
             {isUploading
               ? "Uploading Ebook..."
-              : selectedTargetColl
+              : (selectedTargetColl && selectedTargetColl !== "undefined")
                 ? "Upload Ebook"
-                : "Choose Collection First"}
+                : "Choose Sector First"}
             <input
               type="file"
               className="hidden"
               onChange={handleEbookUpload}
-              disabled={!selectedTargetColl || isUploading}
+              disabled={!selectedTargetColl || selectedTargetColl === "undefined" || isUploading}
             />
           </label>
         </div>
       )}
 
-      {/* Main ebook library display module */}
+      {/* Main library display module */}
       <div className="bg-slate-800/30 rounded-2xl md:rounded-[2rem] border border-slate-700 p-4 sm:p-8">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xs font-mono text-slate-500 uppercase tracking-widest">
@@ -204,7 +206,6 @@ export default function EbookManager({
           </h3>
         </div>
 
-        {/* 🌟 Pass collections data parameters to filter bar dropdown layouts */}
         <SearchFilters
           searchTerm={ebookSearch}
           setSearchTerm={setEbookSearch}
@@ -223,12 +224,10 @@ export default function EbookManager({
         ) : (
           <div className="grid grid-cols-1 gap-3">
             {filteredEbooks.map((book) => (
-              /* 🟢 FIXED: Outer wrapper forced into strict flex-col layout configuration */
               <div
                 key={book.id}
                 className="flex flex-col bg-slate-800/50 p-4 sm:p-5 rounded-2xl border border-slate-700 hover:border-indigo-500/50 transition-all group gap-4 w-full overflow-hidden"
               >
-                {/* 📁 TOP CONTAINER: Book Metadata Fields */}
                 <div className="flex items-start gap-3 sm:gap-4 min-w-0 w-full">
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-slate-200 text-sm sm:text-base break-all sm:break-words">
@@ -244,18 +243,14 @@ export default function EbookManager({
                       <span className="hidden sm:inline text-slate-700 text-[10px]">
                         •
                       </span>
-                      {/* 🌟 Displays collection names dynamically mapped from the join */}
                       <span className="px-1.5 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[8px] font-bold rounded uppercase">
-                        Collection: {book.collection_name || "General Library"}
+                        Target: {book.collection_name || "General Library"}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* ⚡ BOTTOM CONTAINER: Actions interface block aligned layout safely stacked underneath */}
                 <div className="flex items-center justify-between pt-3 border-t border-slate-700/50 w-full gap-2">
-                  
-                  {/* Primary Functional Action Buttons Group */}
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={() => handleViewEbook(book.filename)}
@@ -264,7 +259,6 @@ export default function EbookManager({
                       READ
                     </button>
 
-                    {/* DOWNLOAD BUTTON */}
                     {(user.role === "admin" || user.role === "employee") && (
                       <button
                         onClick={() => handleDownload(book.filename)}
@@ -275,7 +269,6 @@ export default function EbookManager({
                     )}
                   </div>
 
-                  {/* Standalone administrative delete system anchor */}
                   {(user.role === "admin" || user.role === "employee") && (
                     <button
                       onClick={() =>

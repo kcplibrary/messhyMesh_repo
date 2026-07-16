@@ -50,7 +50,7 @@ function App() {
   const fetchCommunities = useCallback(async () => {
     try {
       const targetUrl =
-        "https://customer-yahoo-outing.ngrok-free.dev/backend/api/get_communities.php";
+        "https://explain-banana-bucked.ngrok-free.dev/backend/api/get_communities.php";
       const response = await axios.get(targetUrl, {
         headers: { "ngrok-skip-browser-warning": "true" },
       });
@@ -84,7 +84,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "https://customer-yahoo-outing.ngrok-free.dev/backend/api/login.php",
+        "https://explain-banana-bucked.ngrok-free.dev/backend/api/login.php",
         formData,
       );
 
@@ -118,7 +118,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "https://customer-yahoo-outing.ngrok-free.dev/backend/api/register_student.php",
+        "https://explain-banana-bucked.ngrok-free.dev/backend/api/register_student.php",
         formData,
       );
 

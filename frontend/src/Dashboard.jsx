@@ -18,7 +18,7 @@ import EbookManager from "./components/EbookManager.jsx";
 import AbstractModal from "./components/AbstractModal.jsx";
 
 // const API_BASE = "http://localhost:8000/api";
-const API_BASE = "https://customer-yahoo-outing.ngrok-free.dev/backend/api";
+const API_BASE = "https://explain-banana-bucked.ngrok-free.dev/backend/api";
 
 function Dashboard({ user, logout }) {
   const [currentView, setCurrentView] = useState("papers");
@@ -385,7 +385,7 @@ function Dashboard({ user, logout }) {
     try {
       const response = await axios.post(
         // "http://localhost:8000/api/update_community.php",
-        "https://customer-yahoo-outing.ngrok-free.dev/backend/api/update_community.php",
+        "https://explain-banana-bucked.ngrok-free.dev/backend/api/update_community.php",
         { id: id, name: editName },
       );
       if (response.data.status === "success") {
@@ -425,7 +425,7 @@ function Dashboard({ user, logout }) {
     try {
       const response = await axios.post(
         // "http://localhost:8000/api/delete_community.php",
-        "https://customer-yahoo-outing.ngrok-free.dev/backend/api/delete_community.php",
+        "https://explain-banana-bucked.ngrok-free.dev/backend/api/delete_community.php",
         { id },
       );
       if (response.data.status === "success") {
@@ -535,7 +535,7 @@ function Dashboard({ user, logout }) {
     }
 
     // Added &ngrok-skip-browser-warning=true directly to the URL structure
-    const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/view_file.php?file=${encodeURIComponent(filename)}&ngrok-skip-browser-warning=true`;
+    const fileUrl = `https://explain-banana-bucked.ngrok-free.dev/backend/api/view_file.php?file=${encodeURIComponent(filename)}&ngrok-skip-browser-warning=true`;
     window.open(fileUrl, "_blank");
   };
 
@@ -549,7 +549,7 @@ function Dashboard({ user, logout }) {
       return;
     }
     // Connects directly to your view_ebooks.php backend script file.
-    const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/view_ebooks.php?file=${encodeURIComponent(filename)}&ngrok-skip-browser-warning=true`;
+    const fileUrl = `https://explain-banana-bucked.ngrok-free.dev/backend/api/view_ebooks.php?file=${encodeURIComponent(filename)}&ngrok-skip-browser-warning=true`;
     window.open(fileUrl, "_blank");
   };
 
@@ -829,7 +829,7 @@ const handleRenameCollection = async (id) => {
     try {
       // Fixed the syntax error, removed leading backslash and trailing backtick
       // const fileUrl = `http://localhost:8000/api/download.php?file=${filename}`;
-      const fileUrl = `https://customer-yahoo-outing.ngrok-free.dev/backend/api/download.php?file=${filename}`;
+      const fileUrl = `https://explain-banana-bucked.ngrok-free.dev/backend/api/download.php?file=${filename}`;
 
       // Create a temporary link element
       const link = document.createElement("a");

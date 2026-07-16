@@ -22,14 +22,22 @@ if (!isset($_FILES['file'])) {
 
 $uploader = $_POST['uploader'] ?? 'system'; 
 $collection_id = $_POST['collection_id'] ?? null;
-$bookTitle = $_POST['book_title'] ?? null;
-$bookAuthor = $_POST['book_author'] ?? null;
+$bookTitle = isset($_POST['book_title']) ? trim($_POST['book_title']) : null;
+$bookAuthor = isset($_POST['book_author']) ? trim($_POST['book_author']) : null;
 $bookYear = $_POST['book_year'] ?? null;
-$subjectTags = $_POST['subject_tags'] ?? ''; // Behaves like your 'keywords' string parameter
+$subjectTags = $_POST['subject_tags'] ?? ''; 
 
-if (empty($collection_id) || $collection_id === "null") {
+// Guard against missing target identifiers
+if (empty($collection_id) || $collection_id === "null" || $collection_id === "undefined") {
     http_response_code(400);
     echo json_encode(["status" => "error", "message" => "Routing Error: Select a Sector first."]);
+    exit;
+}
+
+// Check for PHP upload errors before attempting move
+if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+    http_response_code(500);
+    echo json_encode(["status" => "error", "message" => "PHP Upload Error Code: " . $_FILES['file']['error']]);
     exit;
 }
 
@@ -50,19 +58,12 @@ $cleanName = preg_replace("/[^a-z0-9.]+/i", "-", strtolower($onlyName));
 $fileName = date("Ymd") . "_" . time() . "_" . trim($cleanName, "-") . "." . $extension;
 $targetFilePath = $targetDir . $fileName;
 
-// Check for PHP upload errors before attempting move
-if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
-    http_response_code(500);
-    echo json_encode(["status" => "error", "message" => "PHP Upload Error Code: " . $_FILES['file']['error']]);
-    exit;
-}
-
 if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
     try {
         global $pdo; 
         $timestamp = date("Y-m-d H:i:s"); 
 
-        // TARGETS EBOOKS TABLE STRUCTURE matching your design standards
+        // TARGETS EBOOKS TABLE STRUCTURE
         $stmt = $pdo->prepare("INSERT INTO ebooks (filename, collection_id, uploaded_by, upload_date, book_title, book_author, book_year, subject_tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$fileName, (int)$collection_id, $uploader, $timestamp, $bookTitle, $bookAuthor, $bookYear, $subjectTags]);
         
@@ -74,11 +75,15 @@ if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
     } catch (PDOException $e) {
         http_response_code(500);
         error_log("Database Ingestion Crash (Ebooks): " . $e->getMessage());
-        echo json_encode(["status" => "error", "message" => "Indexing Exception: System database core rejected entry storage data record mapping."]);
+        
+        // 🛡️ REVEALS STRUCTURE ISSUES: Sends back the explicit SQL mismatch description directly to toast notifications!
+        echo json_encode([
+            "status" => "error", 
+            "message" => "Database Transaction Aborted: " . $e->getMessage()
+        ]);
     }
 } else {
     http_response_code(500);
-    // Check if the temporary file actually exists
     $tmpExists = file_exists($_FILES["file"]["tmp_name"]) ? "Yes" : "No";
     echo json_encode([
         "status" => "error", 

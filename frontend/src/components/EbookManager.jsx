@@ -60,7 +60,7 @@ export default function EbookManager({
 
     try {
       setIsUploading(true);
-      const res = await axios.post(`${API_BASE}/upload_ebook.php`, formData, {
+      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/upload_ebook.php`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

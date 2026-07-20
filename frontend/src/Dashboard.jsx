@@ -18,7 +18,7 @@ import EbookManager from "./components/EbookManager.jsx";
 import AbstractModal from "./components/AbstractModal.jsx";
 
 // const API_BASE = "http://localhost:8000/api";
-const API_BASE = "https://explain-banana-bucked.ngrok-free.dev/backend/api";
+// const API_BASE = "https://explain-banana-bucked.ngrok-free.dev/backend/api";
 
 function Dashboard({ user, logout }) {
   const [currentView, setCurrentView] = useState("papers");
@@ -97,7 +97,7 @@ function Dashboard({ user, logout }) {
 
     setSettingsLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/update_semester.php`, {
+      const response = await fetch(`https://explain-banana-bucked.ngrok-free.dev/backend/api/update_semester.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -164,7 +164,7 @@ function Dashboard({ user, logout }) {
 
   const fetchFiles = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_files.php`, ngrokConfig);
+      const res = await axios.get(`https://explain-banana-bucked.ngrok-free.dev/backend/api/get_files.php`, ngrokConfig);
       if (Array.isArray(res.data)) setFiles(res.data);
     } catch (err) {
       console.error(err);
@@ -175,7 +175,7 @@ function Dashboard({ user, logout }) {
 
   const fetchEbooks = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_ebooks.php`, ngrokConfig);
+      const res = await axios.get(`https://explain-banana-bucked.ngrok-free.dev/backend/api/get_ebooks.php`, ngrokConfig);
       if (Array.isArray(res.data)) setEbooksList(res.data);
     } catch (err) {
       console.error(err);
@@ -186,7 +186,7 @@ function Dashboard({ user, logout }) {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/get_users.php`, ngrokConfig);
+      const res = await axios.get(`https://explain-banana-bucked.ngrok-free.dev/backend/api/get_users.php`, ngrokConfig);
       if (Array.isArray(res.data)) setUsersList(res.data);
     } catch (err) {
       console.error(err);
@@ -198,7 +198,7 @@ function Dashboard({ user, logout }) {
   const fetchCommunities = useCallback(async () => {
     try {
       const res = await axios.get(
-        `${API_BASE}/get_communities.php`,
+        `https://explain-banana-bucked.ngrok-free.dev/backend/api/get_communities.php`,
         ngrokConfig,
       );
       if (Array.isArray(res.data)) setCommunities(res.data);
@@ -212,7 +212,7 @@ function Dashboard({ user, logout }) {
   const fetchCollections = useCallback(async () => {
     try {
       const res = await axios.get(
-        `${API_BASE}/get_collections.php`,
+        `https://explain-banana-bucked.ngrok-free.dev/backend/api/get_collections.php`,
         ngrokConfig,
       );
       if (Array.isArray(res.data)) setCollections(res.data);
@@ -242,7 +242,7 @@ function Dashboard({ user, logout }) {
         };
       }
 
-      const res = await axios.get(`${API_BASE}/get_stats.php`, config);
+      const res = await axios.get(`https://explain-banana-bucked.ngrok-free.dev/backend/api/get_stats.php`, config);
       if (res.data.status === "success") {
         setStats(res.data.stats); // This updates the state
 
@@ -282,7 +282,7 @@ function Dashboard({ user, logout }) {
     }
 
     try {
-      const res = await axios.post(`${API_BASE}/update_user.php`, {
+      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/update_user.php`, {
         id: id,
         username: editUsername,
         role: editRole,
@@ -342,7 +342,7 @@ function Dashboard({ user, logout }) {
     if (!id) return;
 
     try {
-      const res = await axios.post(`${API_BASE}/delete_user.php`, { id });
+      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/delete_user.php`, { id });
       if (res.data.status === "success") {
         if (typeof fetchUsers === "function") await fetchUsers();
         setUsersList(usersList.filter((u) => u.id !== id));
@@ -481,7 +481,7 @@ function Dashboard({ user, logout }) {
     try {
       setIsUploading(true);
 
-      const res = await axios.post(`${API_BASE}/upload.php`, formData, {
+      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/upload.php`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -565,7 +565,7 @@ const handleCreateCollection = async (e) => {
     }
 
     try {
-      const res = await axios.post(`${API_BASE}/create_collection.php`, {
+      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/create_collection.php`, {
         name: newCollName.trim(),
       });
 
@@ -611,7 +611,7 @@ const handleRenameCollection = async (id) => {
 
   try {
     const response = await axios.post(
-      `${API_BASE}/update_collection.php`,
+      `https://explain-banana-bucked.ngrok-free.dev/backend/api/update_collection.php`,
       { id: id, name: editCollName.trim() }
     );
 
@@ -657,7 +657,7 @@ const handleRenameCollection = async (id) => {
     }
 
     try {
-      const res = await axios.post(`${API_BASE}/create_community.php`, {
+      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/create_community.php`, {
         name: newCommName.trim(),
       });
 
@@ -703,7 +703,7 @@ const handleRenameCollection = async (id) => {
 
     try {
       const response = await axios.post(
-        `${API_BASE}/delete_collection.php`,
+        `https://explain-banana-bucked.ngrok-free.dev/backend/api/delete_collection.php`,
         { id },
       );
       if (response.data.status === "success") {
@@ -754,7 +754,7 @@ const handleRenameCollection = async (id) => {
     params.append("community_id", selectedUserDept);
 
     try {
-      const res = await axios.post(`${API_BASE}/register.php`, params);
+      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/register.php`, params);
       if (res.data.status === "connection success") {
         fetchUsers(); // Refresh the list
 
@@ -791,7 +791,7 @@ const handleRenameCollection = async (id) => {
     if (!id) return;
 
     try {
-      const res = await axios.post(`${API_BASE}/delete_file.php`, { id });
+      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/delete_file.php`, { id });
       if (res.data.status === "success") {
         setFiles(files.filter((f) => f.id !== id));
 
@@ -901,7 +901,7 @@ const handleRenameCollection = async (id) => {
             await handleDeleteFile(confirmModal.targetId);
           } else if (confirmModal.type === "ebook") {
             try {
-              const res = await axios.post(`${API_BASE}/delete_ebook.php`, {
+              const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/delete_ebook.php`, {
                 id: confirmModal.targetId,
               });
               if (res.data.status === "success") {
@@ -1276,7 +1276,7 @@ const handleRenameCollection = async (id) => {
               fetchStats={fetchStats}
               setToast={setToast}
               setConfirmModal={setConfirmModal}
-              API_BASE={API_BASE}
+              // API_BASE={API_BASE}
               handleViewEbook={handleViewEbook}
             />
           </div>

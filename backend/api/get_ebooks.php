@@ -22,7 +22,7 @@ try {
                 eb.*, 
                 c.name AS collection_name 
             FROM ebooks eb
-            LEFT JOIN communities c ON eb.collection_id = c.id 
+            LEFT JOIN collections c ON eb.collection_id = c.id 
             ORDER BY eb.upload_date DESC";
 
     $stmt = $pdo->query($sql);

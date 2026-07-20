@@ -86,6 +86,11 @@ function App() {
       const response = await axios.post(
         "https://explain-banana-bucked.ngrok-free.dev/api/login.php",
         formData,
+        {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      }
       );
 
       if (response.data.status === "connection success") {

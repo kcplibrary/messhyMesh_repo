@@ -385,7 +385,7 @@ git commit -m "ayappooooo unayennn"
 git push origin main
 
 Running the system:
-Terminal 1: cd Documents/messyMesh/backend && php -S 127.0.0.1:8000 //backend server
+Terminal 1: cd Documents/messyMesh && php -S 127.0.0.1:8000 //backend server
 Terminal 2: cd Documents/messyMesh && ngrok http 8000               //ngrok server
 Terminal 3: cd /usr/share/phpmyadmin && sudo php -S localhost:8080  //mysql database server
 Terminal 4: cd Documents/messyMesh && sudo systemctl start mysql    //checking mysql database status

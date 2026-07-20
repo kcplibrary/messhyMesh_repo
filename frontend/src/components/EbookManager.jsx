@@ -58,27 +58,33 @@ export default function EbookManager({
     formData.append("book_year", bookYear);
     formData.append("subject_tags", subjectTags);
 
-    try {
-      setIsUploading(true);
-      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/api/upload_ebook.php`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (res.data.status === "success") {
-        setBookTitle("");
-        setBookAuthor("");
-        setBookYear("");
-        setSubjectTags("");
-        setSelectedTargetColl("");
-        setToast({ message: res.data.message, type: "success" });
-        if (typeof fetchEbooks === "function") await fetchEbooks();
-        if (typeof fetchStats === "function") await fetchStats();
-      } else {
-        setToast({
-          message: res.data.message || "Archive Refused.",
-          type: "error",
-        });
+ try {
+    setIsUploading(true);
+    const res = await axios.post(
+      `https://explain-banana-bucked.ngrok-free.dev/backend/api/upload_ebook.php`,
+      formData,
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
       }
+    );
+
+    if (res.data.status === "success") {
+      setBookTitle("");
+      setBookAuthor("");
+      setBookYear("");
+      setSubjectTags("");
+      setSelectedTargetColl("");
+      setToast({ message: res.data.message, type: "success" });
+      if (typeof fetchEbooks === "function") await fetchEbooks();
+      if (typeof fetchStats === "function") await fetchStats();
+    } else {
+      setToast({
+        message: res.data.message || "Archive Refused.",
+        type: "error",
+      });
+    }
     } catch (err) {
       console.error(err);
       setToast({

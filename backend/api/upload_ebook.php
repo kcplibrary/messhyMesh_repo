@@ -63,6 +63,19 @@ if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
         global $pdo; 
         $timestamp = date("Y-m-d H:i:s"); 
 
+        /* -----------------------------------------------------------------
+         * 🟢 [UPDATE 2]: Foreign Key Validation Check
+         * Verify that the selected community/collection ID actually exists 
+         * in the referenced table before attempting the INSERT statement.
+         * ----------------------------------------------------------------- */
+        $checkStmt = $pdo->prepare("SELECT id FROM communities WHERE id = ?");
+        $checkStmt->execute([(int)$collection_id]);
+        
+        if (!$checkStmt->fetch()) {
+            // Throw exception to trigger catch block & file cleanup
+            throw new Exception("Invalid Sector Selected. ID '{$collection_id}' does not exist in communities table.");
+        }
+
         // TARGETS EBOOKS TABLE STRUCTURE
         $stmt = $pdo->prepare("INSERT INTO ebooks (filename, collection_id, uploaded_by, upload_date, book_title, book_author, book_year, subject_tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$fileName, (int)$collection_id, $uploader, $timestamp, $bookTitle, $bookAuthor, $bookYear, $subjectTags]);
@@ -72,11 +85,24 @@ if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
             "message" => "Asset verified, indexed, and securely archived in the ebook repository.",
             "file" => $fileName
         ]);
-    } catch (PDOException $e) {
-        http_response_code(500);
+    } catch (Exception $e) {
+        /* -----------------------------------------------------------------
+         * 🟢 [UPDATE 1]: File Rollback / Orphan Cleanup
+         * Deletes the uploaded physical file if the database insert fails,
+         * keeping storage clean and synced with MySQL.
+         * ----------------------------------------------------------------- */
+        if (file_exists($targetFilePath)) {
+            unlink($targetFilePath);
+        }
+
+        /* -----------------------------------------------------------------
+         * 🟢 [UPDATE 3]: Explicit JSON Response on Failure
+         * Ensures http_response_code(400) is returned along with
+         * clean, scannable error details for UI Toast alerts.
+         * ----------------------------------------------------------------- */
+        http_response_code(400);
         error_log("Database Ingestion Crash (Ebooks): " . $e->getMessage());
         
-        // 🛡️ REVEALS STRUCTURE ISSUES: Sends back the explicit SQL mismatch description directly to toast notifications!
         echo json_encode([
             "status" => "error", 
             "message" => "Database Transaction Aborted: " . $e->getMessage()

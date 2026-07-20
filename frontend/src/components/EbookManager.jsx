@@ -11,7 +11,7 @@ export default function EbookManager({
   fetchStats,
   setToast,
   setConfirmModal,
-  API_BASE,
+  // API_BASE,
   handleViewEbook,
 }) {
   const [bookTitle, setBookTitle] = useState("");
@@ -60,7 +60,7 @@ export default function EbookManager({
 
     try {
       setIsUploading(true);
-      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/backend/api/upload_ebook.php`, formData, {
+      const res = await axios.post(`https://explain-banana-bucked.ngrok-free.dev/api/upload_ebook.php`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -92,7 +92,7 @@ export default function EbookManager({
 
   const handleDownload = async (filename) => {
     try {
-      const fileUrl = `${API_BASE}/download_ebook.php?file=${encodeURIComponent(filename)}&action=download`;
+      const fileUrl = `https://explain-banana-bucked.ngrok-free.dev/api/download_ebook.php?file=${encodeURIComponent(filename)}&action=download`;
       const link = document.createElement("a");
       link.href = fileUrl;
       link.setAttribute("download", filename);
@@ -163,7 +163,6 @@ export default function EbookManager({
             >
               <option value="">SELECT ASSIGNED DEPT / COMMUNITY / COLLECTION</option>
               {collections.map((c) => {
-                {/* 🌟 CRITICAL FIX: If the list items have a community_id property, we prioritize it to satisfy the database constraint */}
                 const targetId = c.community_id || c.id;
                 return (
                   <option key={c.id || targetId} value={targetId}>

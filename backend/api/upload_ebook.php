@@ -68,7 +68,7 @@ if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
          * Verify that the selected community/collection ID actually exists 
          * in the referenced table before attempting the INSERT statement.
          * ----------------------------------------------------------------- */
-        $checkStmt = $pdo->prepare("SELECT id FROM communities WHERE id = ?");
+        $checkStmt = $pdo->prepare("SELECT id FROM collections WHERE id = ?");
         $checkStmt->execute([(int)$collection_id]);
         
         if (!$checkStmt->fetch()) {

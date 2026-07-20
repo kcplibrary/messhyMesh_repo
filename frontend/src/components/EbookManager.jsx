@@ -169,7 +169,7 @@ export default function EbookManager({
             >
               <option value="">SELECT ASSIGNED DEPT / COMMUNITY / COLLECTION</option>
               {collections.map((c) => {
-                const targetId = c.id || c.community_id;
+                const targetId = c.community_id || c.id;
                 return (
                   <option key={c.id || targetId} value={targetId}>
                     {c.name || c.community_name || "Unnamed Sector"}

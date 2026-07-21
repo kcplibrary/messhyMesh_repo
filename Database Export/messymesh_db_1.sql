@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 20, 2026 at 07:54 AM
+-- Generation Time: Jul 16, 2026 at 01:00 AM
 -- Server version: 8.4.10-0ubuntu0.25.10.1
 -- PHP Version: 8.4.11
 
@@ -389,9 +389,7 @@ INSERT INTO `user_logins` (`id`, `user_id`, `username`, `role`, `login_time`) VA
 (199, 1, 'amnekku', 'admin', '2026-06-18 06:50:49'),
 (200, 1, 'amnekku', 'admin', '2026-06-18 07:00:48'),
 (201, 1, 'amnekku', 'admin', '2026-06-18 07:32:46'),
-(202, 1, 'amnekku', 'admin', '2026-06-23 01:34:00'),
-(203, 2, 'admin', 'admin', '2026-07-20 06:54:54'),
-(204, 1, 'amnekku', 'admin', '2026-07-20 06:57:50');
+(202, 1, 'amnekku', 'admin', '2026-06-23 01:34:00');
 
 --
 -- Indexes for dumped tables
@@ -476,7 +474,7 @@ ALTER TABLE `communities`
 -- AUTO_INCREMENT for table `ebooks`
 --
 ALTER TABLE `ebooks`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `files`
@@ -494,7 +492,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_logins`
 --
 ALTER TABLE `user_logins`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=205;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=203;
 
 --
 -- Constraints for dumped tables
@@ -506,6 +504,12 @@ ALTER TABLE `user_logins`
 ALTER TABLE `bookmarks`
   ADD CONSTRAINT `bookmarks_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `bookmarks_ibfk_2` FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `ebooks`
+--
+ALTER TABLE `ebooks`
+  ADD CONSTRAINT `ebooks_ibfk_1` FOREIGN KEY (`collection_id`) REFERENCES `communities` (`id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

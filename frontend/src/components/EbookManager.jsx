@@ -98,7 +98,7 @@ export default function EbookManager({
 
   const handleDownload = async (filename) => {
     try {
-      const fileUrl = `https://explain-banana-bucked.ngrok-free.dev/api/download_ebook.php?file=${encodeURIComponent(filename)}&action=download`;
+      const fileUrl = `https://explain-banana-bucked.ngrok-free.dev/backend/api/download_ebook.php?file=${encodeURIComponent(filename)}&action=download`;
       const link = document.createElement("a");
       link.href = fileUrl;
       link.setAttribute("download", filename);
